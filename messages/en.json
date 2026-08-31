@@ -1,0 +1,26 @@
+{
+    "common": {
+        "appName": "RukheDao",
+        "language": "Language",
+        "english": "English",
+        "bengali": "বাংলা",
+        "home": "Home"
+    },
+    "home": {
+        "badge": "Community-powered reporting",
+        "title": "Speak up. Document what happened.",
+        "description": "RukheDao helps communities report, document, and discover incidents through a transparent and accessible platform.",
+        "reportIncident": "Report an incident",
+        "viewIncidents": "View incidents",
+        "howItWorksLabel": "How it works",
+        "howItWorksTitle": "Turn information into a public record.",
+        "stepOneTitle": "Report",
+        "stepOneDescription": "Share what happened with the information needed to understand the incident.",
+        "stepTwoTitle": "Document",
+        "stepTwoDescription": "Keep reports structured and organized so important details are easier to find.",
+        "stepThreeTitle": "Discover",
+        "stepThreeDescription": "Explore reported incidents and understand what is happening around you.",
+        "ctaTitle": "Have something that needs to be documented?",
+        "ctaDescription": "Help build a clearer public record by submitting a report."
+    }
+}
