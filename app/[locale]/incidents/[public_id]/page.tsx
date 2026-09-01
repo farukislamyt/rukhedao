@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 
 type PublicIncident = Tables<"public_incidents">;
+type VerificationStatus = NonNullable<PublicIncident["verification_status"]>;
 
 function formatDate(value: string | null, locale: string) {
     if (!value) return "";
@@ -43,17 +44,19 @@ export async function generateMetadata({
     const location = [data.district, data.division].filter(Boolean).join(", ");
     const date = formatDate(data.incident_date, locale);
     const details = [location, date].filter(Boolean).join(" · ");
-    const title = details ? `${data.title} — ${details}` : data.title;
+    const baseTitle = data.title ?? "Incident";
+    const title = details ? `${baseTitle} — ${details}` : baseTitle;
+    const description = truncateDescription(data.description);
 
     return {
         title: `${title} | RukheDao`,
-        description: truncateDescription(data.description),
+        description,
         alternates: {
             canonical: `/${locale}/incidents/${public_id}`,
         },
         openGraph: {
             title,
-            description: truncateDescription(data.description),
+            description,
             type: "article",
             locale: locale === "bn" ? "bn_BD" : "en_US",
         },
@@ -81,6 +84,7 @@ export default async function IncidentDetailPage({
 
     const incident = data as PublicIncident;
     const location = [incident.district, incident.division].filter(Boolean).join(", ");
+    const verificationStatus: VerificationStatus = incident.verification_status ?? "reported";
 
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950">
@@ -98,7 +102,7 @@ export default async function IncidentDetailPage({
                                 </span>
                             )}
                             <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600">
-                                {t(incident.verification_status ?? "reported")}
+                                {t(verificationStatus)}
                             </span>
                         </div>
 
