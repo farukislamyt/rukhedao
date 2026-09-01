@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 type Option = {
     id: string | number | null;
@@ -35,11 +35,14 @@ type IncidentFiltersProps = {
 };
 
 export function IncidentFilters({ categories, divisions, districts, values, labels }: IncidentFiltersProps) {
-    const selectedDivision = divisions.find((division) => division.slug === values.division);
+    const [division, setDivision] = useState(values.division);
+    const [district, setDistrict] = useState(values.district);
+
+    const selectedDivision = divisions.find((item) => item.slug === division);
     const visibleDistricts = useMemo(
         () => selectedDivision?.id == null
             ? districts
-            : districts.filter((district) => district.division_id === Number(selectedDivision.id)),
+            : districts.filter((item) => item.division_id === Number(selectedDivision.id)),
         [districts, selectedDivision],
     );
 
@@ -49,23 +52,31 @@ export function IncidentFilters({ categories, divisions, districts, values, labe
                 {labels.category}
                 <select name="category" defaultValue={values.category} className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
                     <option value="">{labels.all}</option>
-                    {categories.map((category) => <option key={category.slug ?? String(category.id)} value={category.slug ?? ""}>{category.name}</option>)}
+                    {categories.map((item) => <option key={item.slug ?? String(item.id)} value={item.slug ?? ""}>{item.name}</option>)}
                 </select>
             </label>
 
             <label className="grid gap-1.5 text-xs font-semibold text-zinc-600">
                 {labels.division}
-                <select name="division" defaultValue={values.division} className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
+                <select
+                    name="division"
+                    value={division}
+                    onChange={(event) => {
+                        setDivision(event.target.value);
+                        setDistrict("");
+                    }}
+                    className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+                >
                     <option value="">{labels.all}</option>
-                    {divisions.map((division) => <option key={division.slug ?? String(division.id)} value={division.slug ?? ""}>{division.name}</option>)}
+                    {divisions.map((item) => <option key={item.slug ?? String(item.id)} value={item.slug ?? ""}>{item.name}</option>)}
                 </select>
             </label>
 
             <label className="grid gap-1.5 text-xs font-semibold text-zinc-600">
                 {labels.district}
-                <select name="district" defaultValue={values.district} className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
+                <select name="district" value={district} onChange={(event) => setDistrict(event.target.value)} className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
                     <option value="">{labels.all}</option>
-                    {visibleDistricts.map((district) => <option key={district.slug ?? String(district.id)} value={district.slug ?? ""}>{district.name}</option>)}
+                    {visibleDistricts.map((item) => <option key={item.slug ?? String(item.id)} value={item.slug ?? ""}>{item.name}</option>)}
                 </select>
             </label>
 
