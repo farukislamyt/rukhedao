@@ -48,6 +48,7 @@
         "sampleCategory": "Incident category",
         "sampleIncidentTitle": "Published incident record",
         "sampleDate": "Date",
+        "noRecentIncidents": "No published incidents are available yet.",
         "ctaLabel": "Contribute to the record",
         "ctaTitle": "Have something important to document?",
         "ctaDescription": "Submit an anonymous report and help build a clearer public record."
