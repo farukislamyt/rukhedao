@@ -52,5 +52,22 @@
         "ctaLabel": "Contribute to the record",
         "ctaTitle": "Have something important to document?",
         "ctaDescription": "Submit an anonymous report and help build a clearer public record."
+    },
+    "incidents": {
+        "metaTitle": "Published Incidents | RukheDao",
+        "metaDescription": "Explore RukheDao's published public incident records.",
+        "eyebrow": "Public record",
+        "title": "Published incidents",
+        "description": "Explore public records that have been reviewed and approved for publication.",
+        "publishedCount": "{count, plural, =1 {# published incident} other {# published incidents}}",
+        "location": "Location",
+        "date": "Date",
+        "verified": "Verified",
+        "partiallyVerified": "Partially verified",
+        "disputed": "Disputed",
+        "reported": "Reported",
+        "uncategorized": "Uncategorized",
+        "emptyTitle": "No published incidents yet",
+        "emptyDescription": "Approved and published incidents will appear here."
     }
 }
