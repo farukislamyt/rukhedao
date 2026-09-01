@@ -68,7 +68,13 @@
     "reported": "Reported",
     "uncategorized": "Uncategorized",
     "emptyTitle": "No published incidents yet",
-    "emptyDescription": "Approved and published incidents will appear here."
+    "emptyDescription": "Approved and published incidents will appear here.",
+    "searchPlaceholder": "Search incidents, descriptions, or public IDs",
+    "search": "Search",
+    "pagination": "Incident pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {totalPages}"
   },
   "incident": {
     "back": "Back to incidents",
