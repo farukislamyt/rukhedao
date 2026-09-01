@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
+import { ReportIncidentForm } from "@/components/incident/report-incident-form";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
@@ -14,7 +15,8 @@ function formatDate(value: string | null, locale: string) {
         day: "numeric",
         month: "long",
         year: "numeric",
-    }).format(new Date(`${value}T00:00:00`));
+        timeZone: "Asia/Dhaka",
+    }).format(new Date(`${value}T00:00:00+06:00`));
 }
 
 export async function generateMetadata({
@@ -112,6 +114,37 @@ export default async function IncidentDetailPage({
                         </div>
                     </footer>
                 </article>
+
+                <section className="mt-8 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
+                    <div className="mb-6">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">{t("reportEyebrow")}</p>
+                        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em]">{t("reportTitle")}</h2>
+                        <p className="mt-2 text-sm leading-6 text-zinc-500">{t("reportDescription")}</p>
+                    </div>
+                    <ReportIncidentForm
+                        publicId={incident.public_id ?? public_id}
+                        labels={{
+                            title: t("reportTitle"),
+                            description: t("reportDetails"),
+                            reason: t("reportReason"),
+                            reasonPlaceholder: t("reportReasonPlaceholder"),
+                            descriptionPlaceholder: t("reportDetailsPlaceholder"),
+                            submit: t("reportSubmit"),
+                            submitting: t("reportSubmitting"),
+                            success: t("reportSuccess"),
+                            error: t("reportError"),
+                            reasons: {
+                                false_or_misleading: t("reasonFalseOrMisleading"),
+                                privacy_concern: t("reasonPrivacyConcern"),
+                                harmful_content: t("reasonHarmfulContent"),
+                                duplicate: t("reasonDuplicate"),
+                                wrong_location: t("reasonWrongLocation"),
+                                wrong_date: t("reasonWrongDate"),
+                                other: t("reasonOther"),
+                            },
+                        }}
+                    />
+                </section>
             </div>
         </main>
     );
