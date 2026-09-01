@@ -10,6 +10,7 @@ type PublicIncident = Tables<"public_incidents">;
 type Category = Tables<"public_categories">;
 type Division = Tables<"public_divisions">;
 type District = Tables<"public_districts">;
+type VerificationStatus = NonNullable<PublicIncident["verification_status"]>;
 
 type SearchParams = Promise<{
     q?: string;
@@ -35,7 +36,7 @@ function formatDate(value: string | null, locale: string) {
     }).format(new Date(`${value}T00:00:00+06:00`));
 }
 
-function verificationLabel(status: PublicIncident["verification_status"], t: (key: string) => string) {
+function verificationLabel(status: VerificationStatus | null, t: (key: string) => string) {
     switch (status) {
         case "verified": return t("verified");
         case "partially_verified": return t("partiallyVerified");
@@ -72,9 +73,9 @@ export default async function IncidentsPage({ params, searchParams }: {
         throw new Error("Unable to load incident filters.");
     }
 
-    const categories = (categoriesResult.data ?? []) as Category[];
-    const divisions = (divisionsResult.data ?? []) as Division[];
-    const districts = (districtsResult.data ?? []) as District[];
+    const categories = (categoriesResult.data ?? []).filter((item): item is Category => item.id !== null && item.name !== null);
+    const divisions = (divisionsResult.data ?? []).filter((item): item is Division => item.id !== null && item.name !== null);
+    const districts = (districtsResult.data ?? []).filter((item): item is District => item.id !== null && item.name !== null && item.division_id !== null);
 
     let query = supabase
         .from("public_incidents")
@@ -85,7 +86,9 @@ export default async function IncidentsPage({ params, searchParams }: {
     if (filters.category) query = query.eq("category_slug", filters.category);
     if (filters.division) query = query.eq("division_slug", filters.division);
     if (filters.district) query = query.eq("district_slug", filters.district);
-    if (filters.verification) query = query.eq("verification_status", filters.verification);
+    if (filters.verification && ["reported", "partially_verified", "verified", "disputed"].includes(filters.verification)) {
+        query = query.eq("verification_status", filters.verification as VerificationStatus);
+    }
 
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
@@ -151,7 +154,7 @@ export default async function IncidentsPage({ params, searchParams }: {
                         <p className="mb-6 mt-8 text-sm text-zinc-500">{t("publishedCount", { count: count ?? incidents.length })}</p>
                         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                             {incidents.map((incident) => (
-                                <Link key={incident.public_id} href={{ pathname: "/incidents/[public_id]", params: { public_id: incident.public_id ?? "" } }} className="group flex min-h-72 flex-col rounded-2xl border border-zinc-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-lg">
+                                <Link key={incident.public_id} href={`/incidents/${incident.public_id ?? ""}`} className="group flex min-h-72 flex-col rounded-2xl border border-zinc-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-lg">
                                     <div className="flex items-start justify-between gap-4">
                                         <span className="rounded-full border border-zinc-200 bg-stone-50 px-2.5 py-1 text-[11px] font-semibold text-zinc-600">{incident.category ?? t("uncategorized")}</span>
                                         <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] font-semibold text-zinc-600">{verificationLabel(incident.verification_status, t)}</span>
