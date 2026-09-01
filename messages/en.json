@@ -69,5 +69,17 @@
         "uncategorized": "Uncategorized",
         "emptyTitle": "No published incidents yet",
         "emptyDescription": "Approved and published incidents will appear here."
+    },
+    "incident": {
+        "back": "Back to incidents",
+        "publicId": "Public ID",
+        "incidentDate": "Incident date",
+        "location": "Location",
+        "verified": "Verified",
+        "partially_verified": "Partially verified",
+        "disputed": "Disputed",
+        "reported": "Reported",
+        "publicRecord": "This is a public incident record.",
+        "publishedAt": "Published {date}"
     }
 }
