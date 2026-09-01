@@ -4,6 +4,10 @@ import { getTranslations } from "next-intl/server";
 import { AnonymousReportForm } from "@/components/report/anonymous-report-form";
 import { createClient } from "@/lib/supabase/server";
 
+type Category = { id: string; name: string };
+type Division = { id: number; name: string };
+type District = { id: number; division_id: number; name: string };
+
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations("report");
     return { title: t("metaTitle"), description: t("metaDescription") };
@@ -22,6 +26,16 @@ export default async function ReportPage() {
         throw new Error("Unable to load reporting reference data.");
     }
 
+    const categoryOptions: Category[] = (categories.data ?? []).filter(
+        (item): item is Category => item.id !== null && item.name !== null,
+    );
+    const divisionOptions: Division[] = (divisions.data ?? []).filter(
+        (item): item is Division => item.id !== null && item.name !== null,
+    );
+    const districtOptions: District[] = (districts.data ?? []).filter(
+        (item): item is District => item.id !== null && item.division_id !== null && item.name !== null,
+    );
+
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950">
             <section className="border-b border-zinc-200 bg-white">
@@ -38,9 +52,9 @@ export default async function ReportPage() {
                         <p className="mt-2 text-sm leading-6 text-emerald-900/75">{t("privacyDescription")}</p>
                     </div>
                     <AnonymousReportForm
-                        categories={categories.data ?? []}
-                        divisions={divisions.data ?? []}
-                        districts={districts.data ?? []}
+                        categories={categoryOptions}
+                        divisions={divisionOptions}
+                        districts={districtOptions}
                         labels={{
                             incidentTitle: t("incidentTitle"), titlePlaceholder: t("titlePlaceholder"), descriptionLabel: t("descriptionLabel"), descriptionPlaceholder: t("descriptionPlaceholder"),
                             dateLabel: t("dateLabel"), categoryLabel: t("categoryLabel"), divisionLabel: t("divisionLabel"), districtLabel: t("districtLabel"),
