@@ -81,5 +81,26 @@
         "reported": "Reported",
         "publicRecord": "This is a public incident record.",
         "publishedAt": "Published {date}"
+    },
+    "report": {
+        "metaTitle": "Report an Incident | RukheDao",
+        "metaDescription": "Submit an anonymous incident report to RukheDao.",
+        "eyebrow": "Anonymous reporting",
+        "title": "Report an incident",
+        "description": "Share the facts needed to document an important incident. No public account is required.",
+        "privacyTitle": "Protect your privacy",
+        "privacyDescription": "Do not include your name, phone number, email address, or other information that could identify you unless it is necessary for understanding the incident.",
+        "incidentTitle": "Incident title",
+        "titlePlaceholder": "Briefly describe what happened",
+        "descriptionLabel": "What happened?",
+        "descriptionPlaceholder": "Describe the incident with dates, places, people involved, and other relevant facts.",
+        "dateLabel": "Incident date",
+        "locationLabel": "Location",
+        "locationPlaceholder": "District, division, or specific place",
+        "beforeSubmitTitle": "Before submitting",
+        "checkOne": "Focus on observable facts and relevant details.",
+        "checkTwo": "Avoid unnecessary personal or identifying information.",
+        "checkThree": "Only submit information you are comfortable making part of a public-interest record if approved.",
+        "submitComingSoon": "Submission flow coming next"
     }
 }
