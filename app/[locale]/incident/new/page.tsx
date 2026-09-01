@@ -9,12 +9,12 @@ type Division = { id: number; name: string };
 type District = { id: number; division_id: number; name: string };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("incidentNew");
+  const t = await getTranslations("report");
   return { title: t("metaTitle"), description: t("metaDescription") };
 }
 
 export default async function NewIncidentPage() {
-  const t = await getTranslations("incidentNew");
+  const t = await getTranslations("report");
   const supabase = await createClient();
 
   const [categories, divisions, districts] = await Promise.all([
@@ -54,12 +54,12 @@ export default async function NewIncidentPage() {
             divisions={divisionOptions}
             districts={districtOptions}
             labels={{
-              eyebrow: t("formEyebrow"),
-              title: t("formTitle"),
-              description: t("formDescription"),
+              eyebrow: t("eyebrow"),
+              title: t("title"),
+              description: t("description"),
               privacyTitle: t("privacyTitle"),
               privacyDescription: t("privacyDescription"),
-              titleLabel: t("titleLabel"),
+              titleLabel: t("incidentTitle"),
               titlePlaceholder: t("titlePlaceholder"),
               descriptionLabel: t("descriptionLabel"),
               descriptionPlaceholder: t("descriptionPlaceholder"),
@@ -70,21 +70,21 @@ export default async function NewIncidentPage() {
               categoryPlaceholder: t("categoryPlaceholder"),
               divisionPlaceholder: t("divisionPlaceholder"),
               districtPlaceholder: t("districtPlaceholder"),
-              guidanceTitle: t("guidanceTitle"),
-              guidanceOne: t("guidanceOne"),
-              guidanceTwo: t("guidanceTwo"),
-              guidanceThree: t("guidanceThree"),
+              guidanceTitle: t("beforeSubmitTitle"),
+              guidanceOne: t("checkOne"),
+              guidanceTwo: t("checkTwo"),
+              guidanceThree: t("checkThree"),
               submit: t("submit"),
               submitting: t("submitting"),
               successTitle: t("successTitle"),
               successDescription: t("successDescription"),
               publicIdLabel: t("publicIdLabel"),
-              startAnother: t("startAnother"),
-              requiredError: t("requiredError"),
-              futureDateError: t("futureDateError"),
-              invalidError: t("invalidError"),
-              referenceError: t("referenceError"),
-              submitError: t("submitError"),
+              startAnother: t("submit"),
+              requiredError: t("error"),
+              futureDateError: t("error"),
+              invalidError: t("error"),
+              referenceError: t("error"),
+              submitError: t("error"),
             }}
           />
         </div>
