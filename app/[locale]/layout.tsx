@@ -9,6 +9,8 @@ import { routing } from "@/i18n/routing";
 
 import "../globals.css";
 
+const siteUrl = "https://rukhedao.vercel.app";
+
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -20,6 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+    metadataBase: new URL(siteUrl),
     title: "RukheDao",
     description:
         "A community-driven platform for reporting and documenting incidents.",
