@@ -37,7 +37,6 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (submissionLocked.current) return;
-
         submissionLocked.current = true;
         setSubmitting(true);
         setError("");
@@ -81,15 +80,20 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
             });
 
             if (rpcError) {
-                console.error("Anonymous incident submission failed", rpcError);
-                setError(t.error);
+                console.error("create_anonymous_incident failed", {
+                    message: rpcError.message,
+                    details: rpcError.details,
+                    hint: rpcError.hint,
+                    code: rpcError.code,
+                });
+                setError(`${t.error} (${rpcError.code}: ${rpcError.message})`);
                 setSubmitting(false);
                 submissionLocked.current = false;
                 return;
             }
 
             if (typeof data !== "string" || !data.trim()) {
-                console.error("Anonymous incident submission returned no public ID", data);
+                console.error("create_anonymous_incident returned an invalid result", data);
                 setError(t.error);
                 setSubmitting(false);
                 submissionLocked.current = false;
@@ -99,7 +103,7 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
             setResult(data.trim());
             setSubmitting(false);
         } catch (submissionError) {
-            console.error("Anonymous incident submission threw", submissionError);
+            console.error("Unexpected anonymous incident submission error", submissionError);
             setError(t.error);
             setSubmitting(false);
             submissionLocked.current = false;
@@ -150,7 +154,7 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
                 </div>
                 <div>
                     <label htmlFor="district" className="text-sm font-semibold text-zinc-900">{t.districtLabel}</label>
-                    <select id="district" required value={districtId} onChange={(e) => setDistrictId(e.target.value)} disabled={!divisionId} className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none disabled:cursor-not-allowed disabled:bg-zinc-100 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
+                    <select id="district" required value={districtId} onChange={(e) => setDistrictId(e.target.value)} disabled={!divisionId} className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
                         <option value="">{t.districtPlaceholder}</option>
                         {availableDistricts.map((district) => <option key={district.id} value={district.id}>{district.name}</option>)}
                     </select>
@@ -160,7 +164,7 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
                 <h2 className="text-sm font-semibold">{t.beforeSubmitTitle}</h2>
                 <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-600"><li>• {t.checkOne}</li><li>• {t.checkTwo}</li><li>• {t.checkThree}</li></ul>
             </div>
-            {error && <p role="alert" aria-live="assertive" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">{t.error}</p>}
+            {error && <p role="alert" aria-live="assertive" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">{error}</p>}
             <button type="submit" disabled={submitting || !categoryId || !divisionId || !districtId} className="h-12 w-full rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500">{submitting ? t.submitting : t.submit}</button>
         </form>
     );
