@@ -69,5 +69,17 @@
         "uncategorized": "শ্রেণিবিহীন",
         "emptyTitle": "এখনও কোনো প্রকাশিত ঘটনা নেই",
         "emptyDescription": "অনুমোদিত ও প্রকাশিত ঘটনা এখানে দেখা যাবে।"
+    },
+    "incident": {
+        "back": "ঘটনাগুলোতে ফিরে যান",
+        "publicId": "পাবলিক আইডি",
+        "incidentDate": "ঘটনার তারিখ",
+        "location": "স্থান",
+        "verified": "যাচাইকৃত",
+        "partially_verified": "আংশিক যাচাইকৃত",
+        "disputed": "বিতর্কিত",
+        "reported": "রিপোর্ট করা হয়েছে",
+        "publicRecord": "এটি একটি পাবলিক ঘটনার রেকর্ড।",
+        "publishedAt": "প্রকাশিত হয়েছে {date}"
     }
 }
