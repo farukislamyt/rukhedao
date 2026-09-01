@@ -59,6 +59,11 @@ export default async function IncidentsPage({ params, searchParams }: {
     ]);
 
     if (categoriesResult.error || divisionsResult.error || districtsResult.error) {
+        console.error("Failed to load incident filter reference data", {
+            categoriesError: categoriesResult.error,
+            divisionsError: divisionsResult.error,
+            districtsError: districtsResult.error,
+        });
         throw new Error("Unable to load incident filters.");
     }
 

@@ -4,7 +4,19 @@
     "language": "Language",
     "english": "English",
     "bengali": "বাংলা",
-    "home": "Home"
+    "home": "Home",
+    "incidents": "Incidents",
+    "reportIncident": "Report an incident"
+  },
+  "footer": {
+    "tagline": "A public-interest platform for documenting important incidents while keeping public reporting anonymous.",
+    "explore": "Explore",
+    "incidents": "Incidents",
+    "reportIncident": "Report an incident",
+    "howItWorks": "How it works",
+    "privacy": "Privacy first",
+    "anonymousByDesign": "Anonymous by design.",
+    "allRightsReserved": "All rights reserved."
   },
   "home": {
     "badge": "Anonymous public-interest reporting",
@@ -141,6 +153,7 @@
     "successTitle": "Report submitted",
     "successDescription": "Your report has been received for review.",
     "publicIdLabel": "Public ID",
-    "error": "Submission failed"
+    "error": "Submission failed",
+    "referenceErrorHelp": "Please refresh this page and try again."
   }
 }

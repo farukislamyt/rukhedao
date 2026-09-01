@@ -73,7 +73,7 @@ export default async function NewIncidentPage() {
             <div className="rounded-2xl border border-red-200 bg-red-50 p-5" role="alert">
               <p className="text-sm font-semibold text-red-900">{t("error")}</p>
               <p className="mt-2 text-sm leading-6 text-red-800">
-                Please refresh this page and try again.
+                {t("referenceErrorHelp")}
               </p>
             </div>
           ) : (
