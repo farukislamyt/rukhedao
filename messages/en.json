@@ -95,12 +95,21 @@
         "descriptionLabel": "What happened?",
         "descriptionPlaceholder": "Describe the incident with dates, places, people involved, and other relevant facts.",
         "dateLabel": "Incident date",
-        "locationLabel": "Location",
-        "locationPlaceholder": "District, division, or specific place",
+        "categoryLabel": "Category",
+        "divisionLabel": "Division",
+        "districtLabel": "District",
+        "categoryPlaceholder": "Select a category",
+        "divisionPlaceholder": "Select a division",
+        "districtPlaceholder": "Select a district",
         "beforeSubmitTitle": "Before submitting",
         "checkOne": "Focus on observable facts and relevant details.",
         "checkTwo": "Avoid unnecessary personal or identifying information.",
         "checkThree": "Only submit information you are comfortable making part of a public-interest record if approved.",
-        "submitComingSoon": "Submission flow coming next"
+        "submit": "Submit anonymously",
+        "submitting": "Submitting…",
+        "successTitle": "Report submitted",
+        "successDescription": "Your report has been received for review.",
+        "publicIdLabel": "Public ID",
+        "error": "Submission failed"
     }
 }
