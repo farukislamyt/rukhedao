@@ -210,6 +210,57 @@ on public.moderation_actions
 from anon;
 
 
+-- security_invoker public views require SELECT on the specific
+-- source columns they read. Restore only those columns to anon.
+grant select (
+  id,
+  name,
+  slug,
+  description,
+  is_active,
+  sort_order
+)
+on public.categories
+to anon;
+
+grant select (
+  id,
+  name,
+  slug,
+  is_active,
+  sort_order
+)
+on public.divisions
+to anon;
+
+grant select (
+  id,
+  division_id,
+  name,
+  slug,
+  is_active,
+  sort_order
+)
+on public.districts
+to anon;
+
+grant select (
+  id,
+  public_id,
+  category_id,
+  division_id,
+  district_id,
+  title,
+  description,
+  incident_date,
+  status,
+  verification_status,
+  published_at
+)
+on public.incidents
+to anon;
+
+
 -- ------------------------------------------------------------
 -- 4. Re-assert the public-safe reference views
 -- ------------------------------------------------------------
