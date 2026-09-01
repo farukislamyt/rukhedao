@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -29,27 +28,6 @@ function getPublicClient() {
   });
 }
 
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceRoleKey) {
-    throw new Error("Server-side Supabase service role configuration is missing.");
-  }
-
-  return createClient<Database>(url, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-      detectSessionInUrl: false,
-    },
-  });
-}
-
-function makePublicId() {
-  return `RK-${randomBytes(6).toString("hex").toUpperCase()}`;
-}
-
 function isValidCalendarDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const date = new Date(`${value}T00:00:00.000Z`);
@@ -57,12 +35,15 @@ function isValidCalendarDate(value: string) {
 }
 
 function todayInDhaka() {
-  return new Intl.DateTimeFormat("en-CA", {
+  const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Dhaka",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(new Date());
+  }).formatToParts(new Date());
+
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
 }
 
 export async function POST(request: Request) {
@@ -92,68 +73,60 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "The incident date cannot be in the future." }, { status: 400 });
     }
 
-    // Reference validation uses the public-safe views, not the service-role client.
-    // This avoids turning a permissions problem on raw reference tables into a
-    // misleading "reference data" submission failure.
-    const publicClient = getPublicClient();
-    const [{ data: category, error: categoryError }, { data: division, error: divisionError }, { data: district, error: districtError }] = await Promise.all([
-      publicClient.from("public_categories").select("id").eq("id", categoryId).maybeSingle(),
-      publicClient.from("public_divisions").select("id").eq("id", divisionId).maybeSingle(),
-      publicClient.from("public_districts").select("id").eq("id", districtId).eq("division_id", divisionId).maybeSingle(),
-    ]);
+    const supabase = getPublicClient();
 
-    if (categoryError || divisionError || districtError) {
-      console.error("Incident public reference lookup failed", {
-        categoryError,
-        divisionError,
-        districtError,
-      });
-      return NextResponse.json({ message: "Unable to load incident reference data. Please refresh and try again." }, { status: 500 });
-    }
+    // The frozen database contract exposes anonymous submission as a
+    // SECURITY DEFINER RPC granted to anon. Use that canonical path instead
+    // of attempting a direct table INSERT from an API role. This keeps the
+    // database-side validation, public-ID generation, and initial revision
+    // creation inside the frozen database contract and does not require the
+    // service-role key for public incident submission.
+    const { data: publicId, error } = await supabase.rpc("create_anonymous_incident", {
+      p_title: title,
+      p_description: description,
+      p_category_id: categoryId,
+      p_division_id: divisionId,
+      p_district_id: districtId,
+      p_incident_date: incidentDate,
+    });
 
-    if (!category || !division || !district) {
-      return NextResponse.json({ message: "The selected incident category or location is no longer available. Please refresh the page." }, { status: 400 });
-    }
-
-    const supabase = getAdminClient();
-    const publicId = makePublicId();
-
-    // public_id is supplied by the server so the frozen database trigger does
-    // not need to execute its legacy gen_random_bytes() fallback.
-    const { data: incident, error: insertError } = await supabase
-      .from("incidents")
-      .insert({
-        public_id: publicId,
-        category_id: categoryId,
-        division_id: divisionId,
-        district_id: districtId,
-        title,
-        description,
-        incident_date: incidentDate,
-      })
-      .select("public_id")
-      .single();
-
-    if (insertError || !incident?.public_id) {
-      console.error("Anonymous incident insert failed", {
-        code: insertError?.code,
-        message: insertError?.message,
-        details: insertError?.details,
-        hint: insertError?.hint,
+    if (error || typeof publicId !== "string" || !publicId.trim()) {
+      console.error("Anonymous incident RPC failed", {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
       });
 
-      if (insertError?.code === "23505") {
+      if (error?.code === "23505") {
         return NextResponse.json({ message: "A submission reference collision occurred. Please try again." }, { status: 409 });
       }
 
-      if (insertError?.code === "23503") {
+      if (error?.code === "23503") {
         return NextResponse.json({ message: "The selected incident reference is no longer available. Please refresh and try again." }, { status: 400 });
+      }
+
+      const message = error?.message?.toLowerCase() ?? "";
+      if (message.includes("future")) {
+        return NextResponse.json({ message: "The incident date cannot be in the future." }, { status: 400 });
+      }
+
+      if (message.includes("category")) {
+        return NextResponse.json({ message: "The selected incident category is no longer available. Please refresh and try again." }, { status: 400 });
+      }
+
+      if (message.includes("division")) {
+        return NextResponse.json({ message: "The selected division is no longer available. Please refresh and try again." }, { status: 400 });
+      }
+
+      if (message.includes("district")) {
+        return NextResponse.json({ message: "The selected district is no longer available. Please refresh and try again." }, { status: 400 });
       }
 
       return NextResponse.json({ message: "Unable to submit the incident right now. Please try again." }, { status: 500 });
     }
 
-    return NextResponse.json({ publicId: incident.public_id }, { status: 201 });
+    return NextResponse.json({ publicId: publicId.trim() }, { status: 201 });
   } catch (error) {
     console.error("Anonymous incident submission route failed", error);
     return NextResponse.json({ message: "Unable to submit the incident right now. Please try again." }, { status: 500 });
