@@ -56,7 +56,7 @@ export function ReportIncidentForm({ publicId, labels: t }: Props) {
       const { error } = await supabase.rpc("submit_incident_report", {
         p_incident_public_id: publicId,
         p_reason: reason as (typeof reasons)[number],
-        p_description: trimmedDescription || null,
+        p_description: trimmedDescription || undefined,
       });
 
       if (error) {
