@@ -74,7 +74,14 @@
     "pagination": "Incident pages",
     "previous": "Previous",
     "next": "Next",
-    "pageOf": "Page {page} of {totalPages}"
+    "pageOf": "Page {page} of {totalPages}",
+    "category": "Category",
+    "division": "Division",
+    "district": "District",
+    "verification": "Verification",
+    "all": "All",
+    "apply": "Apply filters",
+    "clear": "Clear"
   },
   "incident": {
     "back": "Back to incidents",
