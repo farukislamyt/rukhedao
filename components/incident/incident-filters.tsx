@@ -17,18 +17,12 @@ type IncidentFiltersProps = {
         category: string;
         division: string;
         district: string;
-        verification: string;
     };
     labels: {
         category: string;
         division: string;
         district: string;
-        verification: string;
         all: string;
-        verified: string;
-        partiallyVerified: string;
-        disputed: string;
-        reported: string;
         apply: string;
         clear: string;
     };
@@ -47,7 +41,7 @@ export function IncidentFilters({ categories, divisions, districts, values, labe
     );
 
     return (
-        <form className="grid gap-3 rounded-2xl border border-zinc-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-5" method="get">
+        <form className="grid gap-3 rounded-2xl border border-zinc-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4" method="get">
             <label className="grid gap-1.5 text-xs font-semibold text-zinc-600">
                 {labels.category}
                 <select name="category" defaultValue={values.category} className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
@@ -77,17 +71,6 @@ export function IncidentFilters({ categories, divisions, districts, values, labe
                 <select name="district" value={district} onChange={(event) => setDistrict(event.target.value)} className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
                     <option value="">{labels.all}</option>
                     {visibleDistricts.map((item) => <option key={item.slug ?? String(item.id)} value={item.slug ?? ""}>{item.name}</option>)}
-                </select>
-            </label>
-
-            <label className="grid gap-1.5 text-xs font-semibold text-zinc-600">
-                {labels.verification}
-                <select name="verification" defaultValue={values.verification} className="h-11 rounded-xl border border-zinc-300 bg-white px-3 text-sm font-normal text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10">
-                    <option value="">{labels.all}</option>
-                    <option value="verified">{labels.verified}</option>
-                    <option value="partially_verified">{labels.partiallyVerified}</option>
-                    <option value="disputed">{labels.disputed}</option>
-                    <option value="reported">{labels.reported}</option>
                 </select>
             </label>
 
