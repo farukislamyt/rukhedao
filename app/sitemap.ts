@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 
-const baseUrl = "https://rukhedao.com";
+const baseUrl = "https://rukhedao.vercel.app";
 const publicRoutes = ["", "/incidents", "/report"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
