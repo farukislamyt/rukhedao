@@ -10,14 +10,12 @@ type PublicIncident = Tables<"public_incidents">;
 type Category = Tables<"public_categories">;
 type Division = Tables<"public_divisions">;
 type District = Tables<"public_districts">;
-type VerificationStatus = NonNullable<PublicIncident["verification_status"]>;
 
 type SearchParams = Promise<{
     q?: string;
     category?: string;
     division?: string;
     district?: string;
-    verification?: string;
     page?: string;
 }>;
 
@@ -34,15 +32,6 @@ function formatDate(value: string | null, locale: string) {
         year: "numeric",
         timeZone: "Asia/Dhaka",
     }).format(new Date(`${value}T00:00:00+06:00`));
-}
-
-function verificationLabel(status: VerificationStatus | null, t: (key: string) => string) {
-    switch (status) {
-        case "verified": return t("verified");
-        case "partially_verified": return t("partiallyVerified");
-        case "disputed": return t("disputed");
-        default: return t("reported");
-    }
 }
 
 function safeSearch(value: string) {
@@ -66,7 +55,7 @@ export default async function IncidentsPage({ params, searchParams }: {
     const [categoriesResult, divisionsResult, districtsResult] = await Promise.all([
         supabase.from("public_categories").select("id,name,slug,description,sort_order").order("sort_order", { ascending: true }),
         supabase.from("public_divisions").select("id,name,slug,sort_order").order("sort_order", { ascending: true }),
-        supabase.from("public_districts").select("id,name,slug,division_id,sort_order").order("sort_order", { ascending: true }),
+        supabase.from("public_districts").select("id,name,slug,sort_order,division_id").order("sort_order", { ascending: true }),
     ]);
 
     if (categoriesResult.error || divisionsResult.error || districtsResult.error) {
@@ -86,9 +75,6 @@ export default async function IncidentsPage({ params, searchParams }: {
     if (filters.category) query = query.eq("category_slug", filters.category);
     if (filters.division) query = query.eq("division_slug", filters.division);
     if (filters.district) query = query.eq("district_slug", filters.district);
-    if (filters.verification && ["reported", "partially_verified", "verified", "disputed"].includes(filters.verification)) {
-        query = query.eq("verification_status", filters.verification as VerificationStatus);
-    }
 
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
@@ -105,7 +91,6 @@ export default async function IncidentsPage({ params, searchParams }: {
         if (filters.category) next.set("category", filters.category);
         if (filters.division) next.set("division", filters.division);
         if (filters.district) next.set("district", filters.district);
-        if (filters.verification) next.set("verification", filters.verification);
         if (nextPage > 1) next.set("page", String(nextPage));
         return next.toString();
     };
@@ -128,7 +113,6 @@ export default async function IncidentsPage({ params, searchParams }: {
                     {filters.category && <input type="hidden" name="category" value={filters.category} />}
                     {filters.division && <input type="hidden" name="division" value={filters.division} />}
                     {filters.district && <input type="hidden" name="district" value={filters.district} />}
-                    {filters.verification && <input type="hidden" name="verification" value={filters.verification} />}
                     <button className="h-11 rounded-xl bg-zinc-950 px-5 text-sm font-semibold text-white hover:bg-zinc-800" type="submit">{t("search")}</button>
                 </form>
 
@@ -136,12 +120,8 @@ export default async function IncidentsPage({ params, searchParams }: {
                     categories={categories}
                     divisions={divisions}
                     districts={districts}
-                    values={{ category: filters.category ?? "", division: filters.division ?? "", district: filters.district ?? "", verification: filters.verification ?? "" }}
-                    labels={{
-                        category: t("category"), division: t("division"), district: t("district"), verification: t("verification"),
-                        all: t("all"), verified: t("verified"), partiallyVerified: t("partiallyVerified"), disputed: t("disputed"), reported: t("reported"),
-                        apply: t("apply"), clear: t("clear"),
-                    }}
+                    values={{ category: filters.category ?? "", division: filters.division ?? "", district: filters.district ?? "" }}
+                    labels={{ category: t("category"), division: t("division"), district: t("district"), all: t("all"), apply: t("apply"), clear: t("clear") }}
                 />
 
                 {incidents.length === 0 ? (
@@ -157,7 +137,6 @@ export default async function IncidentsPage({ params, searchParams }: {
                                 <Link key={incident.public_id} href={`/incidents/${incident.public_id ?? ""}`} className="group flex min-h-72 flex-col rounded-2xl border border-zinc-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-lg">
                                     <div className="flex items-start justify-between gap-4">
                                         <span className="rounded-full border border-zinc-200 bg-stone-50 px-2.5 py-1 text-[11px] font-semibold text-zinc-600">{incident.category ?? t("uncategorized")}</span>
-                                        <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] font-semibold text-zinc-600">{verificationLabel(incident.verification_status, t)}</span>
                                     </div>
                                     <h2 className="mt-7 line-clamp-3 text-xl font-semibold leading-7 tracking-[-0.02em] group-hover:underline group-hover:decoration-zinc-300 group-hover:underline-offset-4">{incident.title}</h2>
                                     <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-500">{incident.description}</p>
