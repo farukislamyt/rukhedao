@@ -27,7 +27,6 @@ function getPublicClient() {
       autoRefreshToken: false,
       persistSession: false,
       detectSessionInUrl: false,
-      persistSession: false,
     },
   });
 }
