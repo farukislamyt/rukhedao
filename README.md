@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RukheDao
 
-## Getting Started
+RukheDao is a public incident-reporting web application. Visitors can submit incidents anonymously; submitted incidents enter the existing moderation workflow before they become publicly visible.
 
-First, run the development server:
+## Project status
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The public-facing application and anonymous incident submission flow are implemented. The administrative moderation area is a separate implementation phase.
+
+## Core principles
+
+- **Anonymous reporting:** public incident submission does not require a reporter account.
+- **Moderation before publication:** a successful submission is not automatically public.
+- **Frozen database:** the deployed database is a fixed contract. Application code must adapt to it.
+- **Privacy and least privilege:** public users must not receive administrative access or database write privileges beyond the existing controlled submission path.
+
+## Frozen database rule
+
+**Do not modify the database.**
+
+Do not create Supabase migrations or alter existing tables, columns, constraints, functions, triggers, views, RLS policies, or permissions. Do not add application tables as a workaround for an application-layer issue.
+
+Read [`docs/DATABASE.md`](docs/DATABASE.md) before changing database-facing code.
+
+## Technology
+
+- Next.js 16
+- TypeScript
+- React
+- Supabase / PostgreSQL
+- next-intl
+- Vercel
+
+## Repository structure
+
+```text
+app/          Next.js routes and pages
+components/   Reusable UI components
+features/     Feature-specific application logic
+lib/          Shared clients and utilities
+types/        TypeScript/database types
+supabase/     Existing database definitions
+
+docs/         Project and engineering documentation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Install dependencies and start the development server:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Then open `http://localhost:3000`.
 
-To learn more about Next.js, take a look at the following resources:
+Create local environment variables from `.env.example`. Never commit production secrets or a Supabase service-role key.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Build verification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Before opening a pull request, run:
 
-## Deploy on Vercel
+```bash
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Fix TypeScript and build errors before merging.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Incident workflow
+
+```text
+Anonymous visitor
+      ↓
+Incident submission
+      ↓
+Pending
+      ↓
+Admin / moderation review
+      ↓
+Existing approval/publication rules
+      ↓
+Public incident
+```
+
+The public application must never treat submission success as equivalent to publication.
+
+## Documentation
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution and development rules
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — community standards
+- [`SECURITY.md`](SECURITY.md) — security policy and vulnerability reporting
+- [`docs/DATABASE.md`](docs/DATABASE.md) — frozen database contract
+
+Additional architecture, workflow, deployment, QA, API, and admin documentation should be added as those project areas become stable.
+
+## License
+
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
