@@ -34,12 +34,15 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
         [districts, divisionId],
     );
 
-    async function submit(formData: FormData) {
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
         if (submissionLocked.current) return;
+
         submissionLocked.current = true;
         setSubmitting(true);
         setError("");
 
+        const formData = new FormData(event.currentTarget);
         const title = String(formData.get("title") ?? "").trim();
         const description = String(formData.get("description") ?? "").trim();
         const incidentDate = String(formData.get("incident_date") ?? "");
@@ -77,7 +80,16 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
                 p_incident_date: incidentDate,
             });
 
-            if (rpcError || typeof data !== "string" || !data.trim()) {
+            if (rpcError) {
+                console.error("Anonymous incident submission failed", rpcError);
+                setError(t.error);
+                setSubmitting(false);
+                submissionLocked.current = false;
+                return;
+            }
+
+            if (typeof data !== "string" || !data.trim()) {
+                console.error("Anonymous incident submission returned no public ID", data);
                 setError(t.error);
                 setSubmitting(false);
                 submissionLocked.current = false;
@@ -86,7 +98,8 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
 
             setResult(data.trim());
             setSubmitting(false);
-        } catch {
+        } catch (submissionError) {
+            console.error("Anonymous incident submission threw", submissionError);
             setError(t.error);
             setSubmitting(false);
             submissionLocked.current = false;
@@ -105,7 +118,7 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
     );
 
     return (
-        <form action={submit} className="space-y-7">
+        <form onSubmit={handleSubmit} className="space-y-7">
             <div>
                 <label htmlFor="title" className="text-sm font-semibold text-zinc-900">{t.incidentTitle}</label>
                 <input id="title" name="title" required minLength={5} maxLength={200} autoComplete="off" className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10" placeholder={t.titlePlaceholder} />
