@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 
 type PublicIncident = Tables<"public_incidents">;
-type VerificationStatus = NonNullable<PublicIncident["verification_status"]>;
 
 function formatDate(value: string | null, locale: string) {
     if (!value) return "";
@@ -75,7 +74,7 @@ export default async function IncidentDetailPage({
     const { data, error } = await supabase
         .from("public_incidents")
         .select(
-            "public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at",
+            "public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,published_at",
         )
         .eq("public_id", public_id)
         .maybeSingle();
@@ -84,7 +83,6 @@ export default async function IncidentDetailPage({
 
     const incident = data as PublicIncident;
     const location = [incident.district, incident.division].filter(Boolean).join(", ");
-    const verificationStatus: VerificationStatus = incident.verification_status ?? "reported";
 
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950">
@@ -101,9 +99,6 @@ export default async function IncidentDetailPage({
                                     {incident.category}
                                 </span>
                             )}
-                            <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600">
-                                {t(verificationStatus)}
-                            </span>
                         </div>
 
                         <h1 className="mt-6 text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-5xl">
