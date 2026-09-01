@@ -23,9 +23,6 @@ export default async function NewIncidentPage() {
   const t = await getTranslations("report");
   const supabase = await createClient();
 
-  // Reference data is read-only and comes only from public-safe views.
-  // The actual incident write never touches these views and is handled by
-  // the dedicated anonymous database RPC.
   const [categoriesResult, divisionsResult, districtsResult] = await Promise.all([
     supabase.from("public_categories").select("id,name").order("sort_order", { ascending: true }),
     supabase.from("public_divisions").select("id,name").order("sort_order", { ascending: true }),
