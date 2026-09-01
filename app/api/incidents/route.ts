@@ -11,27 +11,24 @@ type SubmissionBody = {
   districtId?: unknown;
 };
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 function getPublicClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!url || !publishableKey) {
+  if (!url || !key) {
     throw new Error("Public Supabase configuration is missing.");
   }
 
-  return createClient<Database>(url, publishableKey, {
+  return createClient<Database>(url, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
       detectSessionInUrl: false,
     },
   });
-}
-
-function isValidCalendarDate(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
 function todayInDhaka() {
@@ -46,9 +43,49 @@ function todayInDhaka() {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
+function isValidCalendarDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+function databaseErrorMessage(error: { code?: string; message?: string } | null) {
+  const code = error?.code ?? "";
+  const message = error?.message?.toLowerCase() ?? "";
+
+  if (code === "PGRST202" || message.includes("create_anonymous_incident")) {
+    return "The incident submission database is not ready yet. Please deploy the latest database migration and try again.";
+  }
+
+  if (code === "42501" || message.includes("permission denied")) {
+    return "Incident submission permissions are not configured correctly. Please deploy the latest database migration.";
+  }
+
+  if (code === "23505") {
+    return "A submission reference collision occurred. Please try again.";
+  }
+
+  if (code === "22023") {
+    if (message.includes("title")) return "Please enter a valid incident title.";
+    if (message.includes("description")) return "Please enter a valid incident description.";
+    if (message.includes("future")) return "The incident date cannot be in the future.";
+    if (message.includes("date")) return "Please enter a valid incident date.";
+  }
+
+  if (code === "23503") {
+    if (message.includes("category")) return "The selected incident category is no longer available. Please refresh and try again.";
+    if (message.includes("division")) return "The selected division is no longer available. Please refresh and try again.";
+    if (message.includes("district")) return "The selected district is no longer available. Please refresh and try again.";
+    return "The selected incident reference is no longer available. Please refresh and try again.";
+  }
+
+  return null;
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as SubmissionBody;
+
     const title = typeof body.title === "string" ? body.title.trim() : "";
     const description = typeof body.description === "string" ? body.description.trim() : "";
     const incidentDate = typeof body.incidentDate === "string" ? body.incidentDate : "";
@@ -57,16 +94,19 @@ export async function POST(request: Request) {
     const districtId = Number(body.districtId);
 
     if (
-      title.length < 5 || title.length > 200 ||
-      description.length < 20 || description.length > 10000 ||
-      !Number.isInteger(divisionId) || !Number.isInteger(districtId) ||
-      !categoryId
+      title.length < 5 ||
+      title.length > 200 ||
+      description.length < 20 ||
+      description.length > 10000 ||
+      !categoryId ||
+      !Number.isInteger(divisionId) ||
+      !Number.isInteger(districtId)
     ) {
-      return NextResponse.json({ message: "Invalid incident submission." }, { status: 400 });
+      return NextResponse.json({ message: "Please complete all required incident fields." }, { status: 400 });
     }
 
     if (!isValidCalendarDate(incidentDate)) {
-      return NextResponse.json({ message: "Invalid incident date." }, { status: 400 });
+      return NextResponse.json({ message: "Please enter a valid incident date." }, { status: 400 });
     }
 
     if (incidentDate > todayInDhaka()) {
@@ -75,12 +115,10 @@ export async function POST(request: Request) {
 
     const supabase = getPublicClient();
 
-    // The frozen database contract exposes anonymous submission as a
-    // SECURITY DEFINER RPC granted to anon. Use that canonical path instead
-    // of attempting a direct table INSERT from an API role. This keeps the
-    // database-side validation, public-ID generation, and initial revision
-    // creation inside the frozen database contract and does not require the
-    // service-role key for public incident submission.
+    // Canonical anonymous write path. The database RPC performs the final
+    // validation, generates the public reference, creates revision #1 and
+    // writes the incident under SECURITY DEFINER privileges. The API role
+    // never receives direct INSERT permission on the incidents table.
     const { data: publicId, error } = await supabase.rpc("create_anonymous_incident", {
       p_title: title,
       p_description: description,
@@ -98,32 +136,11 @@ export async function POST(request: Request) {
         hint: error?.hint,
       });
 
-      if (error?.code === "23505") {
-        return NextResponse.json({ message: "A submission reference collision occurred. Please try again." }, { status: 409 });
-      }
-
-      if (error?.code === "23503") {
-        return NextResponse.json({ message: "The selected incident reference is no longer available. Please refresh and try again." }, { status: 400 });
-      }
-
-      const message = error?.message?.toLowerCase() ?? "";
-      if (message.includes("future")) {
-        return NextResponse.json({ message: "The incident date cannot be in the future." }, { status: 400 });
-      }
-
-      if (message.includes("category")) {
-        return NextResponse.json({ message: "The selected incident category is no longer available. Please refresh and try again." }, { status: 400 });
-      }
-
-      if (message.includes("division")) {
-        return NextResponse.json({ message: "The selected division is no longer available. Please refresh and try again." }, { status: 400 });
-      }
-
-      if (message.includes("district")) {
-        return NextResponse.json({ message: "The selected district is no longer available. Please refresh and try again." }, { status: 400 });
-      }
-
-      return NextResponse.json({ message: "Unable to submit the incident right now. Please try again." }, { status: 500 });
+      const mapped = databaseErrorMessage(error);
+      return NextResponse.json(
+        { message: mapped ?? "Unable to submit the incident right now. Please try again." },
+        { status: mapped?.includes("not ready") || mapped?.includes("permissions") ? 503 : 500 },
+      );
     }
 
     return NextResponse.json({ publicId: publicId.trim() }, { status: 201 });
