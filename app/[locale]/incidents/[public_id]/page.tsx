@@ -25,6 +25,11 @@ function truncateDescription(value: string | null, maxLength = 160) {
     return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1).trim()}…` : normalized;
 }
 
+function absoluteUrl(path: string) {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rukhedao.vercel.app";
+    return new URL(path, baseUrl).toString();
+}
+
 export async function generateMetadata({
     params,
 }: {
@@ -46,18 +51,27 @@ export async function generateMetadata({
     const baseTitle = data.title ?? "Incident";
     const title = details ? `${baseTitle} — ${details}` : baseTitle;
     const description = truncateDescription(data.description);
+    const path = `/${locale}/incidents/${public_id}`;
+    const englishPath = `/en/incidents/${public_id}`;
+    const bengaliPath = `/bn/incidents/${public_id}`;
 
     return {
         title: `${title} | RukheDao`,
         description,
         alternates: {
-            canonical: `/${locale}/incidents/${public_id}`,
+            canonical: path,
+            languages: {
+                en: englishPath,
+                bn: bengaliPath,
+                "x-default": englishPath,
+            },
         },
         openGraph: {
             title,
             description,
             type: "article",
             locale: locale === "bn" ? "bn_BD" : "en_US",
+            url: absoluteUrl(path),
         },
     };
 }
