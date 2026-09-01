@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 type Category = { id: string; name: string };
 type Division = { id: number; name: string };
@@ -53,14 +52,10 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
         const validDistrict = availableDistricts.some((item) => item.id === district);
 
         if (
-            title.length < 5 ||
-            title.length > 200 ||
-            description.length < 20 ||
-            description.length > 10000 ||
+            title.length < 5 || title.length > 200 ||
+            description.length < 20 || description.length > 10000 ||
             !/^\d{4}-\d{2}-\d{2}$/.test(incidentDate) ||
-            !validCategory ||
-            !validDivision ||
-            !validDistrict
+            !validCategory || !validDivision || !validDistrict
         ) {
             setError(t.error);
             setSubmitting(false);
@@ -69,38 +64,31 @@ export function AnonymousReportForm({ categories, divisions, districts, labels: 
         }
 
         try {
-            const supabase = createClient();
-            const { data, error: rpcError } = await supabase.rpc("create_anonymous_incident", {
-                p_title: title,
-                p_description: description,
-                p_category_id: categoryId,
-                p_division_id: division,
-                p_district_id: district,
-                p_incident_date: incidentDate,
+            const rpcResponse = await fetch("/api/incidents", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title,
+                    description,
+                    incidentDate,
+                    categoryId,
+                    divisionId: division,
+                    districtId: district,
+                }),
             });
 
-            if (rpcError) {
-                console.error("create_anonymous_incident failed", {
-                    message: rpcError.message,
-                    details: rpcError.details,
-                    hint: rpcError.hint,
-                    code: rpcError.code,
-                });
-                setError(`${t.error} (${rpcError.code}: ${rpcError.message})`);
+            const payload = await rpcResponse.json().catch(() => null);
+
+            if (!rpcResponse.ok || typeof payload?.publicId !== "string" || !payload.publicId.trim()) {
+                console.error("Anonymous incident submission failed", payload);
+                const message = typeof payload?.message === "string" ? payload.message : t.error;
+                setError(message);
                 setSubmitting(false);
                 submissionLocked.current = false;
                 return;
             }
 
-            if (typeof data !== "string" || !data.trim()) {
-                console.error("create_anonymous_incident returned an invalid result", data);
-                setError(t.error);
-                setSubmitting(false);
-                submissionLocked.current = false;
-                return;
-            }
-
-            setResult(data.trim());
+            setResult(payload.publicId.trim());
             setSubmitting(false);
         } catch (submissionError) {
             console.error("Unexpected anonymous incident submission error", submissionError);
