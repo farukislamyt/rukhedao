@@ -122,6 +122,10 @@ export default async function IncidentsPage({ params, searchParams }: {
             <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
                 <form className="mb-4 grid gap-3 rounded-2xl border border-zinc-200 bg-white p-4 sm:grid-cols-[1fr_auto]" method="get">
                     <input name="q" defaultValue={q} placeholder={t("searchPlaceholder")} className="h-11 rounded-xl border border-zinc-300 px-4 text-sm outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10" />
+                    {filters.category && <input type="hidden" name="category" value={filters.category} />}
+                    {filters.division && <input type="hidden" name="division" value={filters.division} />}
+                    {filters.district && <input type="hidden" name="district" value={filters.district} />}
+                    {filters.verification && <input type="hidden" name="verification" value={filters.verification} />}
                     <button className="h-11 rounded-xl bg-zinc-950 px-5 text-sm font-semibold text-white hover:bg-zinc-800" type="submit">{t("search")}</button>
                 </form>
 
