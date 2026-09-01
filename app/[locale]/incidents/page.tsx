@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
+import { IncidentFilters } from "@/components/incident/incident-filters";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 
 type PublicIncident = Tables<"public_incidents">;
+type Category = Tables<"public_categories">;
+type Division = Tables<"public_divisions">;
+type District = Tables<"public_districts">;
 
 type SearchParams = Promise<{
     q?: string;
@@ -40,12 +44,13 @@ function verificationLabel(status: PublicIncident["verification_status"], t: (ke
     }
 }
 
+function safeSearch(value: string) {
+    return value.replace(/[(),]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
+}
+
 const PAGE_SIZE = 24;
 
-export default async function IncidentsPage({
-    params,
-    searchParams,
-}: {
+export default async function IncidentsPage({ params, searchParams }: {
     params: Promise<{ locale: string }>;
     searchParams: SearchParams;
 }) {
@@ -55,14 +60,25 @@ export default async function IncidentsPage({
     const supabase = await createClient();
 
     const page = Math.max(1, Number(filters.page) || 1);
-    const q = filters.q?.trim() ?? "";
+    const q = safeSearch(filters.q?.trim() ?? "");
+
+    const [categoriesResult, divisionsResult, districtsResult] = await Promise.all([
+        supabase.from("public_categories").select("id,name,slug,description,sort_order").order("sort_order", { ascending: true }),
+        supabase.from("public_divisions").select("id,name,slug,sort_order").order("sort_order", { ascending: true }),
+        supabase.from("public_districts").select("id,name,slug,division_id,sort_order").order("sort_order", { ascending: true }),
+    ]);
+
+    if (categoriesResult.error || divisionsResult.error || districtsResult.error) {
+        throw new Error("Unable to load incident filters.");
+    }
+
+    const categories = (categoriesResult.data ?? []) as Category[];
+    const divisions = (divisionsResult.data ?? []) as Division[];
+    const districts = (districtsResult.data ?? []) as District[];
 
     let query = supabase
         .from("public_incidents")
-        .select(
-            "public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at",
-            { count: "exact" },
-        )
+        .select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at", { count: "exact" })
         .order("published_at", { ascending: false });
 
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%,public_id.ilike.%${q}%`);
@@ -104,19 +120,31 @@ export default async function IncidentsPage({
             </section>
 
             <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
-                <form className="mb-8 grid gap-3 rounded-2xl border border-zinc-200 bg-white p-4 sm:grid-cols-[1fr_auto]">
+                <form className="mb-4 grid gap-3 rounded-2xl border border-zinc-200 bg-white p-4 sm:grid-cols-[1fr_auto]" method="get">
                     <input name="q" defaultValue={q} placeholder={t("searchPlaceholder")} className="h-11 rounded-xl border border-zinc-300 px-4 text-sm outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10" />
-                    <button className="h-11 rounded-xl bg-zinc-950 px-5 text-sm font-semibold text-white hover:bg-zinc-800">{t("search")}</button>
+                    <button className="h-11 rounded-xl bg-zinc-950 px-5 text-sm font-semibold text-white hover:bg-zinc-800" type="submit">{t("search")}</button>
                 </form>
 
+                <IncidentFilters
+                    categories={categories}
+                    divisions={divisions}
+                    districts={districts}
+                    values={{ category: filters.category ?? "", division: filters.division ?? "", district: filters.district ?? "", verification: filters.verification ?? "" }}
+                    labels={{
+                        category: t("category"), division: t("division"), district: t("district"), verification: t("verification"),
+                        all: t("all"), verified: t("verified"), partiallyVerified: t("partiallyVerified"), disputed: t("disputed"), reported: t("reported"),
+                        apply: t("apply"), clear: t("clear"),
+                    }}
+                />
+
                 {incidents.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-zinc-300 bg-white px-6 py-16 text-center">
+                    <div className="mt-8 rounded-2xl border border-dashed border-zinc-300 bg-white px-6 py-16 text-center">
                         <h2 className="text-xl font-semibold">{t("emptyTitle")}</h2>
                         <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-zinc-500">{t("emptyDescription")}</p>
                     </div>
                 ) : (
                     <>
-                        <p className="mb-6 text-sm text-zinc-500">{t("publishedCount", { count: count ?? incidents.length })}</p>
+                        <p className="mb-6 mt-8 text-sm text-zinc-500">{t("publishedCount", { count: count ?? incidents.length })}</p>
                         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                             {incidents.map((incident) => (
                                 <Link key={incident.public_id} href={{ pathname: "/incidents/[public_id]", params: { public_id: incident.public_id ?? "" } }} className="group flex min-h-72 flex-col rounded-2xl border border-zinc-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-lg">
