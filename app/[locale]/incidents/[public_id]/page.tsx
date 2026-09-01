@@ -19,24 +19,44 @@ function formatDate(value: string | null, locale: string) {
     }).format(new Date(`${value}T00:00:00+06:00`));
 }
 
+function truncateDescription(value: string | null, maxLength = 160) {
+    if (!value) return undefined;
+    const normalized = value.replace(/\s+/g, " ").trim();
+    return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1).trim()}…` : normalized;
+}
+
 export async function generateMetadata({
     params,
 }: {
     params: Promise<{ locale: string; public_id: string }>;
 }): Promise<Metadata> {
-    const { public_id } = await params;
+    const { locale, public_id } = await params;
     const supabase = await createClient();
     const { data } = await supabase
         .from("public_incidents")
-        .select("title,description")
+        .select("title,description,category,division,district,incident_date")
         .eq("public_id", public_id)
         .maybeSingle();
 
     if (!data) return { title: "RukheDao" };
 
+    const location = [data.district, data.division].filter(Boolean).join(", ");
+    const date = formatDate(data.incident_date, locale);
+    const details = [location, date].filter(Boolean).join(" · ");
+    const title = details ? `${data.title} — ${details}` : data.title;
+
     return {
-        title: `${data.title} | RukheDao`,
-        description: data.description ?? undefined,
+        title: `${title} | RukheDao`,
+        description: truncateDescription(data.description),
+        alternates: {
+            canonical: `/${locale}/incidents/${public_id}`,
+        },
+        openGraph: {
+            title,
+            description: truncateDescription(data.description),
+            type: "article",
+            locale: locale === "bn" ? "bn_BD" : "en_US",
+        },
     };
 }
 
@@ -60,11 +80,12 @@ export default async function IncidentDetailPage({
     if (error || !data) notFound();
 
     const incident = data as PublicIncident;
+    const location = [incident.district, incident.division].filter(Boolean).join(", ");
 
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950">
             <div className="mx-auto max-w-4xl px-6 py-10 lg:px-8 lg:py-16">
-                <Link href="/incidents" className="text-sm font-semibold text-zinc-500 hover:text-zinc-950">
+                <Link href="/incidents" className="inline-flex min-h-11 items-center text-sm font-semibold text-zinc-500 hover:text-zinc-950">
                     ← {t("back")}
                 </Link>
 
@@ -88,7 +109,7 @@ export default async function IncidentDetailPage({
                         <div className="mt-7 grid gap-5 border-t border-zinc-200 pt-6 sm:grid-cols-3">
                             <div>
                                 <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400">{t("publicId")}</p>
-                                <p className="mt-1 font-mono text-xs text-zinc-700">{incident.public_id}</p>
+                                <p className="mt-1 break-all font-mono text-xs text-zinc-700">{incident.public_id}</p>
                             </div>
                             <div>
                                 <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400">{t("incidentDate")}</p>
@@ -96,7 +117,7 @@ export default async function IncidentDetailPage({
                             </div>
                             <div>
                                 <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400">{t("location")}</p>
-                                <p className="mt-1 text-sm font-medium text-zinc-700">{[incident.district, incident.division].filter(Boolean).join(", ")}</p>
+                                <p className="mt-1 text-sm font-medium text-zinc-700">{location}</p>
                             </div>
                         </div>
                     </header>
@@ -115,10 +136,10 @@ export default async function IncidentDetailPage({
                     </footer>
                 </article>
 
-                <section className="mt-8 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
+                <section className="mt-8 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="report-record-heading">
                     <div className="mb-6">
                         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">{t("reportEyebrow")}</p>
-                        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.02em]">{t("reportTitle")}</h2>
+                        <h2 id="report-record-heading" className="mt-3 text-2xl font-semibold tracking-[-0.02em]">{t("reportTitle")}</h2>
                         <p className="mt-2 text-sm leading-6 text-zinc-500">{t("reportDescription")}</p>
                     </div>
                     <ReportIncidentForm
