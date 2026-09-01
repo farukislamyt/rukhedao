@@ -9,6 +9,8 @@ import { routing } from "@/i18n/routing";
 
 import "../globals.css";
 
+const siteUrl = "https://rukhedao.vercel.app";
+
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -20,6 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+    metadataBase: new URL(siteUrl),
     title: "RukheDao",
     description:
         "A community-driven platform for reporting and documenting incidents.",
@@ -52,7 +55,7 @@ export default async function LocaleLayout({
             <body className="min-h-full flex flex-col">
                 <NextIntlClientProvider messages={messages}>
                     <Navbar />
-                    <main className="flex-1">{children}</main>
+                    {children}
                 </NextIntlClientProvider>
             </body>
         </html>
