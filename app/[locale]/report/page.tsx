@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
+import { AnonymousReportForm } from "@/components/report/anonymous-report-form";
+import { createClient } from "@/lib/supabase/server";
+
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations("report");
     return { title: t("metaTitle"), description: t("metaDescription") };
@@ -8,6 +11,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ReportPage() {
     const t = await getTranslations("report");
+    const supabase = await createClient();
+    const [categories, divisions, districts] = await Promise.all([
+        supabase.from("public_categories").select("id,name").order("sort_order"),
+        supabase.from("public_divisions").select("id,name").order("sort_order"),
+        supabase.from("public_districts").select("id,division_id,name").order("division_id").order("sort_order"),
+    ]);
+
+    if (categories.error || divisions.error || districts.error) {
+        throw new Error("Unable to load reporting reference data.");
+    }
 
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950">
@@ -24,35 +37,18 @@ export default async function ReportPage() {
                         <h2 className="font-semibold text-emerald-950">{t("privacyTitle")}</h2>
                         <p className="mt-2 text-sm leading-6 text-emerald-900/75">{t("privacyDescription")}</p>
                     </div>
-                    <form className="space-y-7">
-                        <div>
-                            <label htmlFor="title" className="text-sm font-semibold text-zinc-900">{t("incidentTitle")}</label>
-                            <input id="title" name="title" required maxLength={200} className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10" placeholder={t("titlePlaceholder")} />
-                        </div>
-                        <div>
-                            <label htmlFor="description" className="text-sm font-semibold text-zinc-900">{t("descriptionLabel")}</label>
-                            <textarea id="description" name="description" required rows={8} className="mt-2 w-full resize-y rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm leading-6 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10" placeholder={t("descriptionPlaceholder")} />
-                        </div>
-                        <div className="grid gap-7 sm:grid-cols-2">
-                            <div>
-                                <label htmlFor="incident-date" className="text-sm font-semibold text-zinc-900">{t("dateLabel")}</label>
-                                <input id="incident-date" name="incident_date" type="date" required className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10" />
-                            </div>
-                            <div>
-                                <label htmlFor="location" className="text-sm font-semibold text-zinc-900">{t("locationLabel")}</label>
-                                <input id="location" name="location" required maxLength={200} className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10" placeholder={t("locationPlaceholder")} />
-                            </div>
-                        </div>
-                        <div className="rounded-2xl border border-zinc-200 bg-stone-50 p-5">
-                            <h2 className="text-sm font-semibold">{t("beforeSubmitTitle")}</h2>
-                            <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-600">
-                                <li>• {t("checkOne")}</li>
-                                <li>• {t("checkTwo")}</li>
-                                <li>• {t("checkThree")}</li>
-                            </ul>
-                        </div>
-                        <button type="button" disabled className="h-12 w-full cursor-not-allowed rounded-full bg-zinc-300 px-6 text-sm font-semibold text-zinc-500">{t("submitComingSoon")}</button>
-                    </form>
+                    <AnonymousReportForm
+                        categories={categories.data ?? []}
+                        divisions={divisions.data ?? []}
+                        districts={districts.data ?? []}
+                        labels={{
+                            incidentTitle: t("incidentTitle"), titlePlaceholder: t("titlePlaceholder"), descriptionLabel: t("descriptionLabel"), descriptionPlaceholder: t("descriptionPlaceholder"),
+                            dateLabel: t("dateLabel"), categoryLabel: t("categoryLabel"), divisionLabel: t("divisionLabel"), districtLabel: t("districtLabel"),
+                            categoryPlaceholder: t("categoryPlaceholder"), divisionPlaceholder: t("divisionPlaceholder"), districtPlaceholder: t("districtPlaceholder"),
+                            beforeSubmitTitle: t("beforeSubmitTitle"), checkOne: t("checkOne"), checkTwo: t("checkTwo"), checkThree: t("checkThree"),
+                            submit: t("submit"), submitting: t("submitting"), successTitle: t("successTitle"), successDescription: t("successDescription"), publicIdLabel: t("publicIdLabel"), error: t("error"),
+                        }}
+                    />
                 </div>
             </section>
         </main>
