@@ -19,7 +19,7 @@ export async function InformationPage({ namespace }: InformationPageProps) {
         <main className="flex-1 bg-stone-50 text-zinc-950">
             <section className="border-b border-zinc-200 bg-white">
                 <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
-                    <Breadcrumbs items={[{ label: t("title") }]} />
+                    <Breadcrumbs items={[{ label: t("title") }]} homeLabel={tc("home")} />
                 </div>
             </section>
 
@@ -43,9 +43,7 @@ export async function InformationPage({ namespace }: InformationPageProps) {
                             </div>
                         </div>
 
-                        <div aria-label={tc("incidentLedger")}>
-                            <IncidentLedgerSidebar ledgers={ledgers} />
-                        </div>
+                        <IncidentLedgerSidebar ledgers={ledgers} />
                     </div>
                 </div>
             </section>
