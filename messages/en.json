@@ -61,6 +61,9 @@
     "sampleIncidentTitle": "Published incident record",
     "sampleDate": "Date",
     "noRecentIncidents": "No published incidents are available yet.",
+    "ledgerLabel": "Statistics",
+    "divisionLedgerTitle": "Incidents by division",
+    "categoryLedgerTitle": "Incidents by category",
     "ctaLabel": "Contribute to the record",
     "ctaTitle": "Have something important to document?",
     "ctaDescription": "Submit an anonymous report and help build a clearer public record."
@@ -204,4 +207,3 @@
     "actionError": "Failed to complete moderation action."
   }
 }
-
