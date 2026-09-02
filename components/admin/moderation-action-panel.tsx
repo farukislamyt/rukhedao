@@ -69,6 +69,10 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
     [districts, editDivisionId],
   );
 
+  // The panel intentionally re-synchronizes its local form state after router.refresh()
+  // delivers a new server-side incident. This keeps moderation controls aligned with
+  // the authoritative incident revision instead of preserving stale local state.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setStatus(allowedTransitions[0] ?? incident.status);
     setStatusReason("");
@@ -86,6 +90,7 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
     setEditReason("");
     setEditMessage(null);
   }, [allowedTransitions, incident]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   async function handleStatusChange(e: React.FormEvent) {
     e.preventDefault();
@@ -268,7 +273,7 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Category</label>
-                <select value={editCategoryId} onChange={(e) => setEditCategoryId(e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select>
+                <select value={editCategoryId} onChange={(e) => setEditCategoryId(e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"><option value="">Select category</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Incident Date</label>
