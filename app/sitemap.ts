@@ -4,14 +4,31 @@ import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 
 const baseUrl = "https://rukhedao.vercel.app";
-const publicRoutes = ["", "/incidents", "/report"];
+const publicRoutes = [
+    "",
+    "/incidents",
+    "/report",
+    "/about",
+    "/how-it-works",
+    "/privacy",
+    "/content-policy",
+    "/security",
+    "/terms",
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const localizedRoutes = routing.locales.flatMap((locale) =>
         publicRoutes.map((route) => ({
             url: `${baseUrl}/${locale}${route}`,
             changeFrequency: route === "/incidents" ? "daily" as const : "weekly" as const,
-            priority: route === "" ? 1 : route === "/incidents" ? 0.9 : 0.8,
+            priority:
+                route === ""
+                    ? 1
+                    : route === "/incidents"
+                      ? 0.9
+                      : route === "/report"
+                        ? 0.8
+                        : 0.6,
         })),
     );
 
