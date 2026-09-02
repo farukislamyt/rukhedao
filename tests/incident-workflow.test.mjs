@@ -50,7 +50,7 @@ execFileSync(
 );
 
 const { INCIDENT_STATUS_TRANSITIONS, getAllowedIncidentStatusTransitions } = await import(
-  join(process.cwd(), outDir, "lib/admin/incident-workflow.js")
+  join(process.cwd(), outDir, "incident-workflow.js")
 );
 
 test("incident workflow matches the frozen status contract", () => {
