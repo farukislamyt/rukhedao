@@ -14,7 +14,12 @@
     "incidents": "Incidents",
     "reportIncident": "Report an incident",
     "howItWorks": "How it works",
-    "privacy": "Privacy first",
+    "trust": "Trust & transparency",
+    "about": "About RukheDao",
+    "privacy": "Privacy",
+    "contentPolicy": "Content policy",
+    "security": "Security",
+    "terms": "Terms",
     "anonymousByDesign": "Anonymous by design.",
     "allRightsReserved": "All rights reserved."
   },
@@ -204,4 +209,3 @@
     "actionError": "Failed to complete moderation action."
   }
 }
-
