@@ -24,3 +24,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+
+/* RukheDao visual system: use square surfaces throughout the application. */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
