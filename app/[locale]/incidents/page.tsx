@@ -48,6 +48,7 @@ export default async function IncidentsPage({ params, searchParams }: {
     const { locale } = await params;
     const filters = await searchParams;
     const t = await getTranslations("incidents");
+    const tc = await getTranslations("common");
     const supabase = await createClient();
 
     const page = Math.max(1, Number(filters.page) || 1);
@@ -106,11 +107,11 @@ export default async function IncidentsPage({ params, searchParams }: {
         <main className="flex-1 bg-stone-50 text-zinc-950">
             <section className="border-b border-zinc-200 bg-white">
                 <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
-                    <nav aria-label={t("breadcrumb")} className="text-sm">
+                    <nav aria-label={tc("incidents")} className="text-sm">
                         <ol className="flex items-center gap-2 text-zinc-500">
-                            <li><Link href="/" className="hover:text-zinc-950 hover:underline hover:underline-offset-4">{t("breadcrumbHome")}</Link></li>
+                            <li><Link href="/" className="hover:text-zinc-950 hover:underline hover:underline-offset-4">{tc("home")}</Link></li>
                             <li aria-hidden="true">/</li>
-                            <li aria-current="page" className="font-medium text-zinc-950">{t("breadcrumbIncidents")}</li>
+                            <li aria-current="page" className="font-medium text-zinc-950">{tc("incidents")}</li>
                         </ol>
                     </nav>
                 </div>
