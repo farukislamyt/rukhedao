@@ -1,9 +1,15 @@
 import { getTranslations } from "next-intl/server";
 
-import type { HomeLedgerData } from "@/features/home/get-home-ledgers";
+type LedgerItem = {
+    name: string;
+    count: number;
+};
 
 type Props = {
-    ledgers: HomeLedgerData;
+    ledgers: {
+        divisions: LedgerItem[];
+        categories: LedgerItem[];
+    };
 };
 
 export async function IncidentLedgerSidebar({ ledgers }: Props) {
