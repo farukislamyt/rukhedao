@@ -1,6 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { Footer } from "@/components/layout/footer";
 import { getRecentPublishedIncidents } from "@/features/home/get-recent-incidents";
 import { Link } from "@/i18n/navigation";
 
@@ -43,7 +42,6 @@ export default async function HomePage() {
 
                 <section className="bg-zinc-950 text-white"><div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8"><div className="max-w-3xl"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400">{t("ctaLabel")}</p><h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">{t("ctaTitle")}</h2><p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">{t("ctaDescription")}</p></div><Link href="/report" className="inline-flex h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950">{t("reportIncident")}</Link></div></section>
             </main>
-            <Footer />
         </>
     );
 }
