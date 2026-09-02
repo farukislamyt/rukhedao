@@ -4,14 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       base_url:
-        description: "Staging URL to test"
+        description: "Production or approved read-only deployment URL"
         required: true
         type: string
-      allow_mutations:
-        description: "Allow the staging-only write flow"
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -22,10 +17,6 @@ jobs:
     timeout-minutes: 15
     env:
       E2E_BASE_URL: ${{ inputs.base_url }}
-      E2E_ALLOW_MUTATIONS: ${{ inputs.allow_mutations }}
-      E2E_ENVIRONMENT: staging
-      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
-      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -46,7 +37,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run E2E suite
+      - name: Run read-only E2E suite
         run: npx playwright test
 
       - name: Upload Playwright report
