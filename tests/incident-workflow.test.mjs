@@ -1,18 +1,40 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, rmSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const outDir = ".test-dist";
 rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 
+const typeShim = join(outDir, "types-shim.d.ts");
+writeFileSync(
+  typeShim,
+  `declare module "@/types/database" {
+  export type Database = {
+    public: {
+      Enums: {
+        incident_status:
+          | "pending"
+          | "under_review"
+          | "needs_revision"
+          | "approved"
+          | "rejected"
+          | "archived";
+      };
+    };
+  };
+}
+`,
+);
+
 execFileSync(
   "npx",
   [
     "tsc",
     "lib/admin/incident-workflow.ts",
+    typeShim,
     "--outDir",
     outDir,
     "--module",
