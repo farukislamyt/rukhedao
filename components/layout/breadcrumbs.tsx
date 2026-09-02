@@ -1,5 +1,3 @@
-import { getTranslations } from "next-intl/server";
-
 import { Link } from "@/i18n/navigation";
 
 type BreadcrumbItem = {
@@ -9,18 +7,17 @@ type BreadcrumbItem = {
 
 type BreadcrumbsProps = {
     items: BreadcrumbItem[];
+    homeLabel: string;
     ariaLabel?: string;
 };
 
-export async function Breadcrumbs({ items, ariaLabel }: BreadcrumbsProps) {
-    const t = await getTranslations("common");
-
+export function Breadcrumbs({ items, homeLabel, ariaLabel = "Breadcrumb" }: BreadcrumbsProps) {
     return (
-        <nav aria-label={ariaLabel ?? t("breadcrumbs")} className="text-sm">
+        <nav aria-label={ariaLabel} className="text-sm">
             <ol className="flex flex-wrap items-center gap-2 text-zinc-500">
                 <li>
                     <Link href="/" className="hover:text-zinc-950 hover:underline hover:underline-offset-4">
-                        {t("home")}
+                        {homeLabel}
                     </Link>
                 </li>
                 {items.map((item, index) => (
