@@ -16,6 +16,7 @@ function formatIncidentDate(value: string | null, locale: string) {
 
 export default async function HomePage() {
     const t = await getTranslations("home");
+    const ti = await getTranslations("incidents");
     const locale = await getLocale();
     const [incidents, ledgers] = await Promise.all([
         getRecentPublishedIncidents(20),
@@ -71,12 +72,8 @@ export default async function HomePage() {
 
                             <aside className="space-y-8 lg:sticky lg:top-24">
                                 <div>
-                                    <div className="flex items-end justify-between gap-4 border-b border-zinc-200 pb-4">
-                                        <div>
-                                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">{t("ledgerLabel")}</p>
-                                            <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em]">{t("divisionLedgerTitle")}</h3>
-                                        </div>
-                                        <span className="font-mono text-xs text-zinc-400">{ledgers.divisions.length}</span>
+                                    <div className="border-b border-zinc-200 pb-4">
+                                        <h3 className="text-xl font-semibold tracking-[-0.02em]">{ti("division")}</h3>
                                     </div>
                                     <div className="divide-y divide-zinc-200 border-b border-zinc-200">
                                         {ledgers.divisions.map((item) => (
@@ -89,12 +86,8 @@ export default async function HomePage() {
                                 </div>
 
                                 <div>
-                                    <div className="flex items-end justify-between gap-4 border-b border-zinc-200 pb-4">
-                                        <div>
-                                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">{t("ledgerLabel")}</p>
-                                            <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em]">{t("categoryLedgerTitle")}</h3>
-                                        </div>
-                                        <span className="font-mono text-xs text-zinc-400">{ledgers.categories.length}</span>
+                                    <div className="border-b border-zinc-200 pb-4">
+                                        <h3 className="text-xl font-semibold tracking-[-0.02em]">{ti("category")}</h3>
                                     </div>
                                     <div className="divide-y divide-zinc-200 border-b border-zinc-200">
                                         {ledgers.categories.map((item) => (
@@ -109,8 +102,6 @@ export default async function HomePage() {
                         </div>
                     </div>
                 </section>
-
-                <section className="bg-zinc-950 text-white"><div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8"><div className="max-w-3xl"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400">{t("ctaLabel")}</p><h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">{t("ctaTitle")}</h2><p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300">{t("ctaDescription")}</p></div><Link href="/report" className="inline-flex h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950">{t("reportIncident")}</Link></div></section>
             </main>
         </>
     );
