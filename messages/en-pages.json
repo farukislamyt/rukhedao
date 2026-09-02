@@ -1,0 +1,91 @@
+{
+  "siteFooter": {
+    "trust": "Trust & policies",
+    "about": "About RukheDao",
+    "privacy": "Privacy",
+    "contentPolicy": "Content policy",
+    "security": "Security",
+    "terms": "Terms & guidelines",
+    "howItWorks": "How it works"
+  },
+  "sitePages": {
+    "about": {
+      "eyebrow": "About",
+      "title": "A public record built around anonymous participation.",
+      "intro": "RukheDao is a community-driven platform for reporting and documenting incidents of public interest without requiring a public account or reporter profile.",
+      "section1Title": "Why RukheDao exists",
+      "section1Body": "People may witness incidents that deserve a clear public record but may not be comfortable attaching their identity to a report. RukheDao is designed to make reporting possible while keeping the reporter separate from the public record.",
+      "section2Title": "What the platform does",
+      "section2Body": "Reports enter a moderation workflow before publication. Published incidents are presented as public records with stable public identifiers, location and date information where available, and a verification status that communicates the current state of the record.",
+      "section3Title": "What it does not promise",
+      "section3Body": "RukheDao does not guarantee that every submitted claim is true, complete, or independently verified. Moderation and verification are safeguards, not a substitute for careful judgment or primary evidence.",
+      "section4Title": "Open-source transparency",
+      "section4Body": "The project is developed as auditable open-source software. Public code can explain how the application works, while operational infrastructure and staff access remain separate from public participation."
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "From anonymous report to public record.",
+      "intro": "RukheDao separates reporting from publication. A submission is reviewed before it becomes part of the public incident record.",
+      "section1Title": "1. Report",
+      "section1Body": "Anyone can submit an incident without creating a public account. The report should focus on relevant facts and should avoid unnecessary personal information about the reporter or other people.",
+      "section2Title": "2. Review",
+      "section2Body": "A submitted incident starts in a pending state. Authorized staff can move it into review and assess whether the content is suitable for publication, whether more information is needed, or whether it should be rejected.",
+      "section3Title": "3. Verify and publish",
+      "section3Body": "Where appropriate, staff can record a verification status such as reported, partially verified, verified, or disputed. Approved records become publicly visible; verification status does not by itself prove every detail of an incident.",
+      "section4Title": "4. Revisions and moderation",
+      "section4Body": "Some reports may need revision before publication, and published records can later be archived or restored through the moderation workflow. Moderation history is kept separately from the public record."
+    },
+    "privacy": {
+      "eyebrow": "Privacy",
+      "title": "Privacy is part of the reporting model.",
+      "intro": "RukheDao is designed around anonymous public participation rather than user accounts and reporter profiles.",
+      "section1Title": "No public reporter account",
+      "section1Body": "Public reporting does not require registration, a profile, or a public identity. The application does not use a reporter account identifier to connect a person to a submission.",
+      "section2Title": "Reporter identity is not part of the incident record",
+      "section2Body": "The application data model does not store a reporter name, email address, phone number, IP address, device identifier, fingerprint, or persistent reporter identifier alongside an incident submission.",
+      "section3Title": "What you should still avoid submitting",
+      "section3Body": "Do not include your own contact details or unnecessary identifying information in an incident description. Do not publish private personal information about other people. A public incident record can contain facts that you choose to submit, so review your text carefully before sending it.",
+      "section4Title": "Staff access is separate",
+      "section4Body": "Administrative access is handled separately from public reporting. Internal authentication and moderation records are not exposed as part of the public incident record."
+    },
+    "contentPolicy": {
+      "eyebrow": "Content policy",
+      "title": "Keep reports factual, relevant, and safe.",
+      "intro": "RukheDao is intended for documenting incidents of public interest. Moderation may limit or reject content that creates unnecessary harm or does not serve that purpose.",
+      "section1Title": "Focus on public-interest facts",
+      "section1Body": "Reports should describe what happened, when and where it happened, and other relevant context. Avoid speculation presented as fact, personal attacks, or content that is unrelated to the incident.",
+      "section2Title": "Do not expose private information",
+      "section2Body": "Do not submit doxxing, private contact details, credentials, financial information, or other sensitive personal information. Identifying details should only be included when genuinely necessary for understanding a public-interest incident.",
+      "section3Title": "No abuse of the reporting system",
+      "section3Body": "Spam, fabricated reports, malicious submissions, threats, harassment, and attempts to manipulate the public record may be rejected or moderated. Repeated abuse can reduce the reliability and usefulness of the platform.",
+      "section4Title": "Moderation decisions",
+      "section4Body": "Authorized staff may request revision, approve, reject, archive, or otherwise moderate records according to the platform workflow. A moderation decision is not a declaration of legal guilt or innocence."
+    },
+    "security": {
+      "eyebrow": "Security",
+      "title": "A simple security model with clear boundaries.",
+      "intro": "RukheDao keeps public participation separate from administrative access and limits the amount of reporter information stored by the application.",
+      "section1Title": "Public and administrative boundaries",
+      "section1Body": "Public reporting uses controlled application paths for creating incidents. Administrative functions are protected separately and are not exposed through the public interface.",
+      "section2Title": "Data minimization",
+      "section2Body": "The core application model is intentionally limited. Public incident data is separated from moderation history and administrative records, and reporter identity is not stored as part of the submission record.",
+      "section3Title": "Responsible disclosure",
+      "section3Body": "If you discover a security issue, please report it privately to the project maintainers rather than publishing exploit details first. Use the repository's current security or maintainer contact instructions when available.",
+      "section4Title": "Security is not a guarantee",
+      "section4Body": "No online system can promise absolute security. Keep sensitive information out of public reports, and do not treat RukheDao as a secure channel for secrets or confidential documents."
+    },
+    "terms": {
+      "eyebrow": "Terms & guidelines",
+      "title": "Use RukheDao responsibly.",
+      "intro": "By submitting or using public content on RukheDao, you agree to use the service for lawful, good-faith documentation of incidents of public interest.",
+      "section1Title": "Your submissions",
+      "section1Body": "You are responsible for the content you submit. Submit information in good faith, avoid unnecessary personal data, and do not knowingly fabricate or manipulate reports.",
+      "section2Title": "Publication and moderation",
+      "section2Body": "A submission is not automatically published. RukheDao may review, request revision, reject, approve, archive, or restore records according to its moderation workflow. Publication does not mean that every statement has been independently established as fact.",
+      "section3Title": "Public records",
+      "section3Body": "Approved incident information may be visible to the public and may be indexed by search engines. Do not submit information that you expect to remain private or confidential.",
+      "section4Title": "Service limitations",
+      "section4Body": "RukheDao is provided as a public-interest documentation platform and does not guarantee availability, completeness, accuracy, or a particular outcome from a report. These guidelines may be updated as the project evolves."
+    }
+  }
+}
