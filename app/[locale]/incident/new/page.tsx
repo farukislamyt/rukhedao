@@ -24,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NewIncidentPage() {
   const t = await getTranslations("report");
+  const common = await getTranslations("common");
   const supabase = await createClient();
   const ledgers = await getHomeLedgerData();
 
@@ -59,7 +60,7 @@ export default async function NewIncidentPage() {
     <main className="flex-1 bg-stone-50 text-zinc-950">
       <section className="border-b border-zinc-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
-          <Breadcrumbs items={[{ label: t("title") }]} />
+          <Breadcrumbs items={[{ label: t("title") }]} homeLabel={common("home")} />
         </div>
       </section>
 
