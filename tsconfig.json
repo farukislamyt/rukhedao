@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["./*"],
       "next-intl": ["./lib/translations"],
-      "next-intl/server": ["./lib/translations"]
+      "next-intl/server": ["./lib/translations"],
+      "@/i18n/navigation": ["./lib/navigation"]
     }
   },
   "include": [
