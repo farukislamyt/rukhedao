@@ -72,6 +72,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
   const [result, setResult] = useState<string | null>(null);
   const [titleLength, setTitleLength] = useState(0);
   const [descriptionLength, setDescriptionLength] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const availableDistricts = useMemo(
     () => districts.filter((district) => String(district.division_id) === divisionId),
@@ -85,8 +86,21 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
     setSubmitting(false);
     setError("");
     setResult(null);
+    setCopied(false);
     setTitleLength(0);
     setDescriptionLength(0);
+  }
+
+  async function copyPublicId() {
+    if (!result) return;
+
+    try {
+      await navigator.clipboard.writeText(result);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -181,16 +195,37 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">{t.successTitle}</p>
         <h2 className="mt-3 text-2xl font-semibold tracking-tight text-emerald-950 sm:text-3xl">{t.successDescription}</h2>
         <div className="mt-7 rounded-2xl border border-emerald-200 bg-white p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">{t.publicIdLabel}</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">{t.publicIdLabel}</p>
+            <button
+              type="button"
+              onClick={copyPublicId}
+              className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
+              aria-label="পাবলিক আইডি কপি করুন"
+            >
+              {copied ? "কপি হয়েছে" : "কপি করুন"}
+            </button>
+          </div>
           <p className="mt-2 break-all font-mono text-lg font-semibold tracking-wide text-zinc-950">{result}</p>
         </div>
-        <button
-          type="button"
-          onClick={resetForm}
-          className="mt-6 h-11 rounded-full border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
-        >
-          {t.startAnother}
-        </button>
+        <p className="mt-5 text-sm leading-6 text-emerald-950/70">
+          এই রেফারেন্স নম্বরটি সংরক্ষণ করুন। এটি আপনার রিপোর্টের গোপন রেফারেন্স নম্বর।
+        </p>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={resetForm}
+            className="h-11 flex-1 rounded-full bg-zinc-950 px-5 text-sm font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
+          >
+            {t.startAnother}
+          </button>
+          <a
+            href="/"
+            className="flex h-11 flex-1 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
+          >
+            হোমে ফিরুন
+          </a>
+        </div>
       </section>
     );
   }
