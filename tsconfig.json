@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "next-intl": ["./lib/translations"],
+      "next-intl/server": ["./lib/translations"]
     }
   },
   "include": [
