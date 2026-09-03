@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { AdminUser } from "@/lib/auth/get-current-staff";
@@ -59,8 +58,6 @@ export function AdminNavbar({ staff }: Props) {
               {staff.display_name}
             </p>
           </div>
-
-          <LanguageSwitcher />
 
           <button
             type="button"
