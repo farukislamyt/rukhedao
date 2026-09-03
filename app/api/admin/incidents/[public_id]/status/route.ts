@@ -6,7 +6,14 @@ import type { Database } from "@/types/database";
 
 type IncidentStatus = Database["public"]["Enums"]["incident_status"];
 type StatusBody = { toStatus?: unknown; reason?: unknown };
-const INCIDENT_STATUSES = ["under_review", "approved", "rejected"] as const satisfies readonly IncidentStatus[];
+const INCIDENT_STATUSES = [
+  "pending",
+  "under_review",
+  "needs_revision",
+  "approved",
+  "rejected",
+  "archived",
+] as const satisfies readonly IncidentStatus[];
 
 export async function POST(
   request: Request,
