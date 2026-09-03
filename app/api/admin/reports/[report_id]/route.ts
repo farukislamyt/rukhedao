@@ -25,7 +25,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ rep
     const { error } = await supabase.rpc("moderate_incident_report", {
       p_report_id: report_id,
       p_action: action as (typeof ACTIONS)[number],
-      p_reason: reason ?? null,
+      p_reason: reason,
     });
     if (error) {
       console.error("Failed to moderate incident report", { code: error.code, message: error.message });
