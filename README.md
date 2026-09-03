@@ -8,7 +8,7 @@ The public-facing application, anonymous incident submission flow, and administr
 
 ## Core principles
 
-- **Bengali-only interface:** the application uses Bengali as its sole interface language.
+- **Bengali-only interface:** Bengali is the sole interface language and UI copy is kept directly in the application source.
 - **Anonymous reporting:** public incident submission does not require a reporter account.
 - **Moderation before publication:** a successful submission is not automatically public.
 - **Frozen database:** the deployed database is a fixed contract. Application code must adapt to it.
@@ -28,7 +28,6 @@ Read [`docs/DATABASE.md`](docs/DATABASE.md) before changing database-facing code
 - TypeScript
 - React
 - Supabase / PostgreSQL
-- next-intl (static Bengali message provider)
 - Vercel
 
 ## Repository structure

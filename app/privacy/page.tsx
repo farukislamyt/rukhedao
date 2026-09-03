@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
 
 import { InformationPage } from "@/components/content/information-page";
 
-export async function generateMetadata(): Promise<Metadata> {
-    const t = await getTranslations("sitePages.privacy");
-    return { title: t("title"), description: t("intro") };
-}
+export const metadata: Metadata = {
+    title: "গোপনীয়তা",
+    description: "রুখেদাও কীভাবে তথ্য ও গোপনীয়তা রক্ষা করে তা জানুন।",
+};
 
 export default function PrivacyPage() {
-    return <InformationPage namespace="privacy" />;
+    return <InformationPage page="privacy" />;
 }

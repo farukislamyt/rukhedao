@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
 
 import { InformationPage } from "@/components/content/information-page";
 
-export async function generateMetadata(): Promise<Metadata> {
-    const t = await getTranslations("sitePages.contentPolicy");
-    return { title: t("title"), description: t("intro") };
-}
+export const metadata: Metadata = {
+    title: "বিষয়বস্তু ব্যবহারের নিয়ম",
+    description: "রুখেদাও-তে কী ধরনের বিষয়বস্তু গ্রহণযোগ্য, তা জানুন।",
+};
 
 export default function ContentPolicyPage() {
-    return <InformationPage namespace="contentPolicy" />;
+    return <InformationPage page="contentPolicy" />;
 }
