@@ -5,11 +5,7 @@ import { InformationPage } from "@/components/content/information-page";
 
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations("sitePages.howItWorks");
-
-    return {
-        title: t("title"),
-        description: t("intro"),
-    };
+    return { title: t("title"), description: t("intro") };
 }
 
 export default function HowItWorksPage() {

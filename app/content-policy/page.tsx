@@ -4,14 +4,10 @@ import { getTranslations } from "next-intl/server";
 import { InformationPage } from "@/components/content/information-page";
 
 export async function generateMetadata(): Promise<Metadata> {
-    const t = await getTranslations("sitePages.terms");
-
-    return {
-        title: t("title"),
-        description: t("intro"),
-    };
+    const t = await getTranslations("sitePages.contentPolicy");
+    return { title: t("title"), description: t("intro") };
 }
 
-export default function TermsPage() {
-    return <InformationPage namespace="terms" />;
+export default function ContentPolicyPage() {
+    return <InformationPage namespace="contentPolicy" />;
 }

@@ -1,13 +1,14 @@
 # RukheDao
 
-RukheDao is a public incident-reporting web application. Visitors can submit incidents anonymously; submitted incidents enter the existing moderation workflow before they become publicly visible.
+RukheDao is a Bengali-only public incident-reporting web application. Visitors can submit incidents anonymously; submitted incidents enter the existing moderation workflow before they become publicly visible.
 
 ## Project status
 
-The public-facing application and anonymous incident submission flow are implemented. The administrative moderation area is a separate implementation phase.
+The public-facing application, anonymous incident submission flow, and administrative moderation area are implemented. All application routes are served without a language prefix.
 
 ## Core principles
 
+- **Bengali-only interface:** the application uses Bengali as its sole interface language.
 - **Anonymous reporting:** public incident submission does not require a reporter account.
 - **Moderation before publication:** a successful submission is not automatically public.
 - **Frozen database:** the deployed database is a fixed contract. Application code must adapt to it.
@@ -27,7 +28,7 @@ Read [`docs/DATABASE.md`](docs/DATABASE.md) before changing database-facing code
 - TypeScript
 - React
 - Supabase / PostgreSQL
-- next-intl
+- next-intl (static Bengali message provider)
 - Vercel
 
 ## Repository structure
