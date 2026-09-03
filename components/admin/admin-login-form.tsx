@@ -1,12 +1,52 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "@/lib/translations";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export function AdminLoginForm() {
-  const t = useTranslations("admin"); const router = useRouter(); const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [loading,setLoading]=useState(false); const [error,setError]=useState("");
-  async function handleLogin(e: React.FormEvent) { e.preventDefault(); if (loading) return; setLoading(true); setError(""); try { const supabase=createClient(); const {error:signInError}=await supabase.auth.signInWithPassword({email:email.trim(),password}); if(signInError){setError(t("invalidCredentials"));setLoading(false);return;} router.push("/admin"); router.refresh(); } catch(err){console.error("Login unexpected error",err);setError(t("invalidCredentials"));setLoading(false);} }
-  return <form onSubmit={handleLogin} className="space-y-6"><div><label htmlFor="admin-email" className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">{t("email")}</label><input id="admin-email" type="email" required autoComplete="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="staff@rukhedao.org" className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white/10" /></div><div><label htmlFor="admin-password" className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">{t("password")}</label><input id="admin-password" type="password" required autoComplete="current-password" value={password} onChange={(e)=>setPassword(e.target.value)} className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white/10" /></div>{error ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-300">{error}</div> : null}<button type="submit" disabled={loading || !email || !password} className="h-12 w-full rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600">{loading ? t("signingIn") : t("signIn")}</button></form>;
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+    setError("");
+    try {
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (signInError) {
+        setError("ইমেইল বা পাসওয়ার্ড সঠিক নয়।");
+        setLoading(false);
+        return;
+      }
+      router.push("/admin");
+      router.refresh();
+    } catch (err) {
+      console.error("Login unexpected error", err);
+      setError("ইমেইল বা পাসওয়ার্ড সঠিক নয়।");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleLogin} className="space-y-6">
+      <div>
+        <label htmlFor="admin-email" className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">ইমেইল</label>
+        <input id="admin-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@rukhedao.org" className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white/10" />
+      </div>
+      <div>
+        <label htmlFor="admin-password" className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">পাসওয়ার্ড</label>
+        <input id="admin-password" type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white/10" />
+      </div>
+      {error ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-300">{error}</div> : null}
+      <button type="submit" disabled={loading || !email || !password} className="h-12 w-full rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600">
+        {loading ? "প্রবেশ করা হচ্ছে…" : "লগইন করুন"}
+      </button>
+    </form>
+  );
 }
