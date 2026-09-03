@@ -6,7 +6,7 @@ const baseUrl = "https://rukhedao.vercel.app";
 const publicRoutes = [
     "",
     "/incidents",
-    "/report",
+    "/incident/new",
     "/about",
     "/how-it-works",
     "/privacy",
@@ -16,15 +16,15 @@ const publicRoutes = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const localizedRoutes = publicRoutes.map((route) => ({
-        url: `${baseUrl}/bn${route}`,
+    const routes = publicRoutes.map((route) => ({
+        url: `${baseUrl}${route}`,
         changeFrequency: route === "/incidents" ? "daily" as const : "weekly" as const,
         priority:
             route === ""
                 ? 1
                 : route === "/incidents"
                   ? 0.9
-                  : route === "/report"
+                  : route === "/incident/new"
                     ? 0.8
                     : 0.6,
     }));
@@ -36,11 +36,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .not("public_id", "is", null);
 
     const incidentRoutes = (data ?? []).map((incident) => ({
-        url: `${baseUrl}/bn/incidents/${incident.public_id}`,
+        url: `${baseUrl}/incidents/${incident.public_id}`,
         lastModified: incident.published_at ? new Date(incident.published_at) : undefined,
         changeFrequency: "monthly" as const,
         priority: 0.7,
     }));
 
-    return [...localizedRoutes, ...incidentRoutes];
+    return [...routes, ...incidentRoutes];
 }
