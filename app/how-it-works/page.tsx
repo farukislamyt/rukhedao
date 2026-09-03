@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-
 import { InformationPage } from "@/components/content/information-page";
 
-export async function generateMetadata(): Promise<Metadata> {
-    const t = await getTranslations("sitePages.howItWorks");
-    return { title: t("title"), description: t("intro") };
-}
+export const metadata: Metadata = { title: "যেভাবে কাজ করে", description: "রুখেদাও-তে একটি ঘটনা কীভাবে জানানো, পর্যালোচনা, যাচাই ও প্রকাশ করা হয় তা জানুন।" };
 
 export default function HowItWorksPage() {
-    return <InformationPage namespace="howItWorks" />;
+    return <InformationPage page="howItWorks" />;
 }
