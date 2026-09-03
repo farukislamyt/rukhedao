@@ -24,9 +24,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
-    title: "RukheDao",
+    title: "রুখেদাও",
     description:
-        "A community-driven platform for reporting and documenting incidents.",
+        "বেনামী রিপোর্টিং ও পর্যালোচনার মাধ্যমে জনস্বার্থসংশ্লিষ্ট গুরুত্বপূর্ণ ঘটনাগুলো নথিভুক্ত করার একটি প্ল্যাটফর্ম।",
 };
 
 type LocaleLayoutProps = {
@@ -50,7 +50,7 @@ export default async function LocaleLayout({
 
     return (
         <html
-            lang={locale}
+            lang="bn"
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col">
