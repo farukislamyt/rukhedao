@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:unit": "node --test tests/incident-workflow.test.mjs"
+    "test:unit": "node --test tests/incident-workflow.test.mjs tests/anonymous-submission-security.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

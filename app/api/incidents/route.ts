@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -12,6 +11,8 @@ type SubmissionBody = {
   districtId?: unknown;
 };
 
+const MAX_BODY_BYTES = 16_384;
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -24,14 +25,6 @@ function url() {
 function reader() {
   const k = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!k) throw new Error("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is missing.");
-  return createClient<Database>(url(), k, {
-    auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
-  });
-}
-
-function writer() {
-  const k = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!k) return null;
   return createClient<Database>(url(), k, {
     auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
   });
@@ -54,13 +47,30 @@ function validDate(v: string) {
   return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
 }
 
-function makePublicId() {
-  return `RK-${randomBytes(6).toString("hex").toUpperCase()}`;
-}
-
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as SubmissionBody;
+    const contentType = request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();
+    if (contentType !== "application/json") {
+      return NextResponse.json({ message: "Invalid request format." }, { status: 415 });
+    }
+
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && Number.isFinite(Number(contentLength)) && Number(contentLength) > MAX_BODY_BYTES) {
+      return NextResponse.json({ message: "The submitted incident is too large." }, { status: 413 });
+    }
+
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ message: "The submitted incident is too large." }, { status: 413 });
+    }
+
+    let body: SubmissionBody;
+    try {
+      body = JSON.parse(rawBody) as SubmissionBody;
+    } catch {
+      return NextResponse.json({ message: "Invalid request body." }, { status: 400 });
+    }
+
     const title = typeof body.title === "string" ? body.title.trim() : "";
     const description = typeof body.description === "string" ? body.description.trim() : "";
     const incidentDate = typeof body.incidentDate === "string" ? body.incidentDate : "";
@@ -128,32 +138,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Try Direct Insert via service_role client (with generated public_id)
-    const db = writer();
-    if (db) {
-      const id = makePublicId();
-      const insertResult = await db
-        .from("incidents")
-        .insert({
-          public_id: id,
-          category_id: categoryId,
-          division_id: divisionId,
-          district_id: districtId,
-          title,
-          description,
-          incident_date: incidentDate,
-        })
-        .select("public_id")
-        .single();
-
-      if (!insertResult.error && insertResult.data?.public_id) {
-        return NextResponse.json({ publicId: insertResult.data.public_id }, { status: 201 });
-      }
-
-      console.error("Service role insert failed", insertResult.error);
-    }
-
-    // 2. Try RPC function create_anonymous_incident via anon client
+    // Anonymous creation must use the existing frozen database RPC.
+    // Do not bypass it with a service-role insert or create a second write path.
     const rpcResult = await read.rpc("create_anonymous_incident", {
       p_title: title,
       p_description: description,
@@ -167,21 +153,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ publicId: rpcResult.data }, { status: 201 });
     }
 
-    console.error("Database submission failed", {
-      rpcError: rpcResult.error,
+    console.error("Anonymous incident RPC failed", {
+      code: rpcResult.error?.code,
+      message: rpcResult.error?.message,
+      details: rpcResult.error?.details,
+      hint: rpcResult.error?.hint,
     });
 
     return NextResponse.json(
-      {
-        message:
-          "Database permission error: The database rejected the insert. Please ensure 'grant select, insert on public.incidents to service_role;' is run in Supabase SQL Editor.",
-      },
-      { status: 500 },
+      { message: "Unable to submit the incident right now. Please try again later." },
+      { status: 503 },
     );
   } catch (error) {
     console.error("Anonymous incident submission route failed", error);
     return NextResponse.json(
-      { message: "Unable to submit the incident right now. Please try again." },
+      { message: "Unable to submit the incident right now. Please try again later." },
       { status: 500 },
     );
   }
