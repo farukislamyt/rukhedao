@@ -97,7 +97,7 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
     if (statusLoading || !allowedTransitions.includes(status)) return;
     const reason = statusReason.trim();
     if (!reason) {
-      setStatusMessage({ type: "error", text: `${t("reason")} is required.` });
+      setStatusMessage({ type: "error", text: `${t("reason")} আবশ্যক।` });
       return;
     }
     setStatusLoading(true);
@@ -128,7 +128,7 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
     if (verificationLoading || verification === incident.verification_status) return;
     const reason = verificationReason.trim();
     if (!reason) {
-      setVerificationMessage({ type: "error", text: `${t("reason")} is required.` });
+      setVerificationMessage({ type: "error", text: `${t("reason")} আবশ্যক।` });
       return;
     }
     setVerificationLoading(true);
@@ -159,7 +159,7 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
     if (editLoading) return;
     const reason = editReason.trim();
     if (!reason) {
-      setEditMessage({ type: "error", text: `${t("reason")} is required.` });
+      setEditMessage({ type: "error", text: `${t("reason")} আবশ্যক।` });
       return;
     }
     setEditLoading(true);
@@ -199,21 +199,21 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Workflow</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">পর্যালোচনার ধারা</p>
             <h3 className="mt-1 text-base font-semibold text-zinc-950 dark:text-white">{t("changeStatus")}</h3>
-            <p className="mt-1 text-xs text-zinc-500">Current: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{t(STATUS_LABEL_KEYS[incident.status])}</span></p>
+            <p className="mt-1 text-xs text-zinc-500">বর্তমান: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{t(STATUS_LABEL_KEYS[incident.status])}</span></p>
           </div>
           <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-semibold text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-            {allowedTransitions.length} {allowedTransitions.length === 1 ? "next action" : "next actions"}
+            {allowedTransitions.length} {allowedTransitions.length === 1 ? "পরবর্তী কাজ" : "পরবর্তী কাজগুলো"}
           </span>
         </div>
 
         {allowedTransitions.length === 0 ? (
-          <div className="mt-5 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">No further workflow transition is available from this status.</div>
+          <div className="mt-5 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">এই অবস্থা থেকে আর কোনো পরিবর্তন করা যাবে না।</div>
         ) : (
           <form onSubmit={handleStatusChange} className="mt-5 space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Next valid status</label>
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">পরবর্তী অবস্থা</label>
               <select value={status} onChange={(e) => setStatus(e.target.value as IncidentStatus)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
                 {allowedTransitions.map((value) => <option key={value} value={value}>{t(STATUS_LABEL_KEYS[value])}</option>)}
               </select>
@@ -223,20 +223,20 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
               <input required maxLength={2000} value={statusReason} onChange={(e) => setStatusReason(e.target.value)} placeholder={t("reasonPlaceholder")} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
             </div>
             {statusMessage && <p className={`text-xs ${statusMessage.type === "success" ? "text-emerald-600" : "text-red-600"}`}>{statusMessage.text}</p>}
-            <button type="submit" disabled={statusLoading} className="h-10 rounded-xl bg-zinc-950 px-4 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-zinc-950">{statusLoading ? "Updating…" : t("applyStatusChange")}</button>
+            <button type="submit" disabled={statusLoading} className="h-10 rounded-xl bg-zinc-950 px-4 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-zinc-950">{statusLoading ? "পরিবর্তন করা হচ্ছে…" : t("applyStatusChange")}</button>
           </form>
         )}
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Assessment</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">যাচাইয়ের অবস্থা</p>
           <h3 className="mt-1 text-base font-semibold text-zinc-950 dark:text-white">{t("changeVerification")}</h3>
-          <p className="mt-1 text-xs text-zinc-500">Current: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{t(VERIFICATION_LABEL_KEYS[incident.verification_status])}</span></p>
+          <p className="mt-1 text-xs text-zinc-500">বর্তমান: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{t(VERIFICATION_LABEL_KEYS[incident.verification_status])}</span></p>
         </div>
         <form onSubmit={handleVerificationChange} className="mt-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Assessment</label>
+            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">যাচাইয়ের অবস্থা</label>
             <select value={verification} onChange={(e) => setVerification(e.target.value as VerificationStatus)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
               {(Object.keys(VERIFICATION_LABEL_KEYS) as VerificationStatus[]).map((value) => <option key={value} value={value}>{t(VERIFICATION_LABEL_KEYS[value])}</option>)}
             </select>
@@ -246,47 +246,47 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
             <input required maxLength={2000} value={verificationReason} onChange={(e) => setVerificationReason(e.target.value)} placeholder={t("reasonPlaceholder")} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
           </div>
           {verificationMessage && <p className={`text-xs ${verificationMessage.type === "success" ? "text-emerald-600" : "text-red-600"}`}>{verificationMessage.text}</p>}
-          <button type="submit" disabled={verificationLoading || verification === incident.verification_status} className="h-10 rounded-xl bg-zinc-950 px-4 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-zinc-950">{verificationLoading ? "Updating…" : t("applyVerificationChange")}</button>
+          <button type="submit" disabled={verificationLoading || verification === incident.verification_status} className="h-10 rounded-xl bg-zinc-950 px-4 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-zinc-950">{verificationLoading ? "পরিবর্তন করা হচ্ছে…" : t("applyVerificationChange")}</button>
         </form>
       </section>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Content</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">বিষয়বস্তু</p>
             <h3 className="mt-1 text-base font-semibold text-zinc-950 dark:text-white">{t("editIncident")}</h3>
             <p className="mt-1 text-xs text-zinc-500">{t("editIncidentHelp")}</p>
           </div>
-          <button type="button" onClick={() => setIsEditing((value) => !value)} className="rounded-xl border border-zinc-300 px-3 py-1.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">{isEditing ? "Cancel" : "Edit / Redact"}</button>
+          <button type="button" onClick={() => setIsEditing((value) => !value)} className="rounded-xl border border-zinc-300 px-3 py-1.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">{isEditing ? "বাতিল" : "সম্পাদনা / ব্যক্তিগত তথ্য বাদ দিন"}</button>
         </div>
 
         {isEditing && (
           <form onSubmit={handleEditSubmit} className="mt-5 space-y-4 border-t border-zinc-200 pt-5 dark:border-zinc-800">
             <div>
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Title</label>
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">শিরোনাম</label>
               <input required minLength={5} maxLength={200} value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Description</label>
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">বিবরণ</label>
               <textarea required rows={7} minLength={20} maxLength={10000} value={editDescription} onChange={(e) => setEditDescription(e.target.value)} className="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Category</label>
-                <select value={editCategoryId} onChange={(e) => setEditCategoryId(e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"><option value="">Select category</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">ঘটনার ধরন</label>
+                <select value={editCategoryId} onChange={(e) => setEditCategoryId(e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"><option value="">ঘটনার ধরন বেছে নিন</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Incident Date</label>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">ঘটনার তারিখ</label>
                 <input type="date" required value={editDate} onChange={(e) => setEditDate(e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Division</label>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">বিভাগ</label>
                 <select value={editDivisionId} onChange={(e) => { const nextDivision = Number(e.target.value); setEditDivisionId(nextDivision); const firstDistrict = districts.find((district) => district.division_id === nextDivision); if (firstDistrict) setEditDistrictId(firstDistrict.id); }} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">{divisions.map((division) => <option key={division.id} value={division.id}>{division.name}</option>)}</select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">District</label>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">জেলা</label>
                 <select value={editDistrictId} onChange={(e) => setEditDistrictId(Number(e.target.value))} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">{availableDistricts.map((district) => <option key={district.id} value={district.id}>{district.name}</option>)}</select>
               </div>
             </div>
@@ -295,7 +295,7 @@ export function ModerationActionPanel({ incident, categories, divisions, distric
               <input required maxLength={2000} value={editReason} onChange={(e) => setEditReason(e.target.value)} placeholder={t("reasonPlaceholder")} className="mt-1 h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
             </div>
             {editMessage && <p className={`text-xs ${editMessage.type === "success" ? "text-emerald-600" : "text-red-600"}`}>{editMessage.text}</p>}
-            <button type="submit" disabled={editLoading} className="h-10 rounded-xl bg-zinc-950 px-4 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-zinc-950">{editLoading ? "Saving…" : "Save revision"}</button>
+            <button type="submit" disabled={editLoading} className="h-10 rounded-xl bg-zinc-950 px-4 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-zinc-950">{editLoading ? "সংরক্ষণ করা হচ্ছে…" : "সংশোধন সংরক্ষণ করুন"}</button>
           </form>
         )}
       </section>
