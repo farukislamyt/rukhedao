@@ -11,9 +11,11 @@ type InformationPageProps = {
 };
 
 export async function InformationPage({ namespace }: InformationPageProps) {
-    const t = await getTranslations(`sitePages.${namespace}`);
-    const tc = await getTranslations("common");
-    const ledgers = await getHomeLedgerData();
+    const [t, tc, ledgers] = await Promise.all([
+        getTranslations(`sitePages.${namespace}`),
+        getTranslations("common"),
+        getHomeLedgerData(),
+    ]);
 
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950">

@@ -29,6 +29,10 @@ export const metadata: Metadata = {
         "A community-driven platform for reporting and documenting incidents.",
 };
 
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
+
 type LocaleLayoutProps = {
     children: React.ReactNode;
     params: Promise<{

@@ -23,10 +23,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NewIncidentPage() {
-  const t = await getTranslations("report");
-  const common = await getTranslations("common");
-  const supabase = await createClient();
-  const ledgers = await getHomeLedgerData();
+  const [t, common, supabase, ledgers] = await Promise.all([
+    getTranslations("report"),
+    getTranslations("common"),
+    createClient(),
+    getHomeLedgerData(),
+  ]);
 
   const [categoriesResult, divisionsResult, districtsResult] = await Promise.all([
     supabase.from("public_categories").select("id,name").order("sort_order", { ascending: true }),
