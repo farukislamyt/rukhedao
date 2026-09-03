@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { AdminUser } from "@/lib/auth/get-current-staff";
@@ -36,7 +35,7 @@ export function AdminNavbar({ staff }: Props) {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-4 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+          <nav className="hidden md:flex items-center gap-4 text-sm font-medium text-zinc-600 dark:text-zinc-400" aria-label="অ্যাডমিন নেভিগেশন">
             <Link
               href="/admin"
               className="transition hover:text-zinc-950 dark:hover:text-white"
@@ -48,7 +47,7 @@ export function AdminNavbar({ staff }: Props) {
               target="_blank"
               className="text-xs text-zinc-400 transition hover:text-zinc-700 dark:hover:text-zinc-300"
             >
-              ↗ Public Site
+              ↗ পাবলিক সাইট
             </Link>
           </nav>
         </div>
@@ -59,8 +58,6 @@ export function AdminNavbar({ staff }: Props) {
               {staff.display_name}
             </p>
           </div>
-
-          <LanguageSwitcher />
 
           <button
             type="button"
