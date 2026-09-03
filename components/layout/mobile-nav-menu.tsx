@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Link } from "@/i18n/navigation";
 
 type Props = {
@@ -77,9 +76,6 @@ export function MobileNavMenu({ homeLabel, incidentsLabel, reportLabel }: Props)
             <Link href="/incident/new" onClick={closeMenu} className="mt-2 inline-flex min-h-11 items-center justify-center rounded-xl bg-zinc-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 dark:focus-visible:ring-white">
               {reportLabel}
             </Link>
-            <div className="mt-2 border-t border-zinc-200 px-1 pt-2 dark:border-zinc-800">
-              <LanguageSwitcher />
-            </div>
           </nav>
         </div>
       )}
