@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 
 type Category = { id: string; name: string }; type Division = { id: number; name: string }; type District = { id: number; division_id: number; name: string };
 export const dynamic = "force-dynamic"; export const revalidate = 0;
-export const metadata: Metadata = { title: "ঘটনা জানান | রুখেদাও", description: "পরিচয় গোপন রেখে একটি গুরুত্বপূর্ণ ঘটনা জানান।" };
+export const metadata: Metadata = { title: "ঘটনা জানান", description: "পরিচয় গোপন রেখে একটি গুরুত্বপূর্ণ ঘটনা জানান।", robots: { index: false, follow: true, googleBot: { index: false, follow: true } } };
 export default async function NewIncidentPage() {
   const supabase = await createClient(); const [ledgers, categoriesResult, divisionsResult, districtsResult] = await Promise.all([getHomeLedgerData(), supabase.from("public_categories").select("id,name").order("sort_order", { ascending: true }), supabase.from("public_divisions").select("id,name").order("sort_order", { ascending: true }), supabase.from("public_districts").select("id,division_id,name").order("division_id", { ascending: true }).order("sort_order", { ascending: true })]);
   const referenceError = categoriesResult.error || divisionsResult.error || districtsResult.error; if (referenceError) console.error("Incident reference data failed to load", referenceError);
