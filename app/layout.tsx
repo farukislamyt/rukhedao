@@ -3,10 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 import "./globals.css";
-
-const siteUrl = "https://rukhedao.vercel.app";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -19,10 +18,57 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    metadataBase: new URL(siteUrl),
-    title: "রুখেদাও",
-    description:
-        "বেনামী রিপোর্টিং ও পর্যালোচনার মাধ্যমে জনস্বার্থসংশ্লিষ্ট গুরুত্বপূর্ণ ঘটনাগুলো নথিভুক্ত করার একটি প্ল্যাটফর্ম।",
+    metadataBase: new URL(SITE_URL),
+    title: {
+        default: SITE_NAME,
+        template: `%s | ${SITE_NAME}`,
+    },
+    description: SITE_DESCRIPTION,
+    applicationName: SITE_NAME,
+    category: "public interest",
+    alternates: {
+        canonical: "/",
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
+        },
+    },
+    openGraph: {
+        type: "website",
+        locale: "bn_BD",
+        url: SITE_URL,
+        siteName: SITE_NAME,
+        title: SITE_NAME,
+        description: SITE_DESCRIPTION,
+    },
+    twitter: {
+        card: "summary",
+        title: SITE_NAME,
+        description: SITE_DESCRIPTION,
+    },
+};
+
+const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+};
+
+const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    alternateName: "RukheDao",
+    url: SITE_URL,
+    inLanguage: "bn-BD",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -32,6 +78,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col">
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+                />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+                />
                 <Navbar />
                 {children}
                 <Footer />

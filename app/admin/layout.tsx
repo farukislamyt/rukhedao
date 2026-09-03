@@ -1,5 +1,18 @@
+import type { Metadata } from "next";
+
 import { getCurrentStaff } from "@/lib/auth/get-current-staff";
 import { AdminNavbar } from "@/components/admin/admin-navbar";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const staffSession = await getCurrentStaff();

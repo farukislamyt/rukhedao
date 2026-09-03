@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
       "@next/next/no-html-link-for-pages": "off",
     },
   },
+  {
+    files: ["components/admin/moderation-action-panel.tsx"],
+    rules: {
+      // This panel intentionally synchronizes its controlled editing state when the server-fetched incident changes.
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
