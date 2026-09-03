@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
 import { MobileNavMenu } from "@/components/layout/mobile-nav-menu";
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Link } from "@/i18n/navigation";
 
 export async function Navbar() {
@@ -41,8 +40,6 @@ export async function Navbar() {
                     >
                         {t("reportIncident")}
                     </Link>
-
-                    <LanguageSwitcher />
                 </div>
 
                 <MobileNavMenu
