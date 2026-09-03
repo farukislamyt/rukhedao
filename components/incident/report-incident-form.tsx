@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 type Props = {
   publicId: string;
@@ -52,14 +51,17 @@ export function ReportIncidentForm({ publicId, labels: t }: Props) {
     }
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.rpc("submit_incident_report", {
-        p_incident_public_id: publicId,
-        p_reason: reason as (typeof reasons)[number],
-        p_description: trimmedDescription || undefined,
+      const response = await fetch("/api/incidents/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          publicId,
+          reason,
+          description: trimmedDescription || undefined,
+        }),
       });
 
-      if (error) {
+      if (!response.ok) {
         setMessage("error");
         setSubmitting(false);
         locked.current = false;
