@@ -1,9 +1,6 @@
 {
   "common": {
     "appName": "রুখেদাও",
-    "language": "ভাষা",
-    "english": "ইংরেজি",
-    "bengali": "বাংলা",
     "home": "প্রচ্ছদ",
     "incidents": "ঘটনাগুলো",
     "reportIncident": "ঘটনা জানান"
