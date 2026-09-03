@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/translations";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
