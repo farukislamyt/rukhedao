@@ -11,9 +11,9 @@ import type { Tables } from "@/types/database";
 
 type PublicIncident = Tables<"public_incidents">;
 
-function formatDate(value: string | null, locale: string) {
+function formatDate(value: string | null) {
     if (!value) return "";
-    return new Intl.DateTimeFormat(locale === "bn" ? "bn-BD" : "en-US", {
+    return new Intl.DateTimeFormat("bn-BD", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -37,7 +37,7 @@ export async function generateMetadata({
 }: {
     params: Promise<{ locale: string; public_id: string }>;
 }): Promise<Metadata> {
-    const { locale, public_id } = await params;
+    const { public_id } = await params;
     const supabase = await createClient();
     const { data } = await supabase
         .from("public_incidents")
@@ -45,34 +45,27 @@ export async function generateMetadata({
         .eq("public_id", public_id)
         .maybeSingle();
 
-    if (!data) return { title: "RukheDao" };
+    if (!data) return { title: "রুখেদাও" };
 
     const location = [data.district, data.division].filter(Boolean).join(", ");
-    const date = formatDate(data.incident_date, locale);
+    const date = formatDate(data.incident_date);
     const details = [location, date].filter(Boolean).join(" · ");
-    const baseTitle = data.title ?? "Incident";
+    const baseTitle = data.title ?? "ঘটনা";
     const title = details ? `${baseTitle} — ${details}` : baseTitle;
     const description = truncateDescription(data.description);
-    const path = `/${locale}/incidents/${public_id}`;
-    const englishPath = `/en/incidents/${public_id}`;
-    const bengaliPath = `/bn/incidents/${public_id}`;
+    const path = `/bn/incidents/${public_id}`;
 
     return {
-        title: `${title} | RukheDao`,
+        title: `${title} | রুখেদাও`,
         description,
         alternates: {
             canonical: path,
-            languages: {
-                en: englishPath,
-                bn: bengaliPath,
-                "x-default": englishPath,
-            },
         },
         openGraph: {
             title,
             description,
             type: "article",
-            locale: locale === "bn" ? "bn_BD" : "en_US",
+            locale: "bn_BD",
             url: absoluteUrl(path),
         },
     };
@@ -83,7 +76,7 @@ export default async function IncidentDetailPage({
 }: {
     params: Promise<{ locale: string; public_id: string }>;
 }) {
-    const { locale, public_id } = await params;
+    const { public_id } = await params;
     const t = await getTranslations("incident");
     const tc = await getTranslations("common");
     const supabase = await createClient();
@@ -144,7 +137,7 @@ export default async function IncidentDetailPage({
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400">{t("incidentDate")}</p>
-                                        <p className="mt-1 text-sm font-medium text-zinc-700">{formatDate(incident.incident_date, locale)}</p>
+                                        <p className="mt-1 text-sm font-medium text-zinc-700">{formatDate(incident.incident_date)}</p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400">{t("location")}</p>
@@ -162,7 +155,7 @@ export default async function IncidentDetailPage({
                             <footer className="border-t border-zinc-200 bg-stone-50 px-6 py-6 sm:px-10">
                                 <div className="flex flex-col gap-3 text-xs leading-5 text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
                                     <p>{t("publicRecord")}</p>
-                                    <p>{t("publishedAt", { date: formatDate(incident.published_at?.slice(0, 10) ?? null, locale) })}</p>
+                                    <p>{t("publishedAt", { date: formatDate(incident.published_at?.slice(0, 10) ?? null) })}</p>
                                 </div>
                             </footer>
                         </article>
