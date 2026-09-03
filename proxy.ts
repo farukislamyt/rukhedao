@@ -1,11 +1,11 @@
 import createMiddleware from "next-intl/middleware";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { routing } from "./i18n/routing";
 
 const handleI18nRouting = createMiddleware(routing);
 
-export default function proxy(request: Parameters<typeof handleI18nRouting>[0]) {
+export default function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
 
     if (pathname === "/en" || pathname.startsWith("/en/")) {
