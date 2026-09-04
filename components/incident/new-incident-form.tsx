@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { DatePicker } from "@/components/ui/date-picker";
 
 type Category = { id: string; name: string };
 type Division = { id: number; name: string };
@@ -65,67 +66,43 @@ function isValidCalendarDate(value: string) {
 
 export function NewIncidentForm({ categories, divisions, districts, labels: t }: Props) {
   const [divisionId, setDivisionId] = useState("");
-  const [categoryId, setCategoryId] = useState("");
   const [districtId, setDistrictId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [incidentDate, setIncidentDate] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
+
   const [titleLength, setTitleLength] = useState(0);
   const [descriptionLength, setDescriptionLength] = useState(0);
+
   const [copied, setCopied] = useState(false);
 
-  const availableDistricts = useMemo(
-    () => districts.filter((district) => String(district.division_id) === divisionId),
-    [districts, divisionId],
-  );
-
-  function resetForm() {
-    setDivisionId("");
-    setCategoryId("");
-    setDistrictId("");
-    setSubmitting(false);
-    setError("");
-    setResult(null);
-    setCopied(false);
-    setTitleLength(0);
-    setDescriptionLength(0);
-  }
-
-  async function copyPublicId() {
-    if (!result) return;
-
-    try {
-      await navigator.clipboard.writeText(result);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  }
+  const availableDistricts = useMemo(() => {
+    if (!divisionId) return [];
+    return districts.filter((district) => district.division_id === Number(divisionId));
+  }, [divisionId, districts]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submitting || result) return;
+    setError(null);
 
-    const form = event.currentTarget;
-    const data = new FormData(form);
+    const formData = new FormData(event.currentTarget);
+    const title = (formData.get("title") as string)?.trim() ?? "";
+    const description = (formData.get("description") as string)?.trim() ?? "";
+    const today = todayInDhaka();
 
-    const title = String(data.get("title") ?? "").trim();
-    const description = String(data.get("description") ?? "").trim();
-    const incidentDate = String(data.get("incident_date") ?? "");
-    const division = Number(data.get("division_id"));
-    const district = Number(data.get("district_id"));
-    const category = String(data.get("category_id") ?? "");
-
-    setError("");
-
-    if (!title || !description || !category || !Number.isInteger(division) || !Number.isInteger(district) || !incidentDate) {
+    if (
+      title.length < 5 ||
+      title.length > 200 ||
+      description.length < 20 ||
+      description.length > 10000 ||
+      !categoryId ||
+      !divisionId ||
+      !districtId ||
+      !incidentDate
+    ) {
       setError(t.requiredError);
-      return;
-    }
-
-    if (title.length < 5 || title.length > 200 || description.length < 20 || description.length > 10000) {
-      setError(t.invalidError);
       return;
     }
 
@@ -134,17 +111,8 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
       return;
     }
 
-    if (incidentDate > todayInDhaka()) {
+    if (incidentDate > today) {
       setError(t.futureDateError);
-      return;
-    }
-
-    const validCategory = categories.some((item) => item.id === category);
-    const validDivision = divisions.some((item) => item.id === division);
-    const validDistrict = availableDistricts.some((item) => item.id === district);
-
-    if (!validCategory || !validDivision || !validDistrict) {
-      setError(t.referenceError);
       return;
     }
 
@@ -153,75 +121,91 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
     try {
       const response = await fetch("/api/incidents", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           title,
           description,
           incidentDate,
-          categoryId: category,
-          divisionId: division,
-          districtId: district,
+          categoryId,
+          divisionId: Number(divisionId),
+          districtId: Number(districtId),
         }),
       });
 
-      const payload = await response.json().catch(() => null);
+      const payload = (await response.json()) as { publicId?: string; message?: string };
 
-      if (!response.ok || typeof payload?.publicId !== "string" || !payload.publicId.trim()) {
-        console.error("Incident submission failed", {
-          status: response.status,
-          payload,
-        });
-        setError(typeof payload?.message === "string" ? payload.message : t.submitError);
+      if (!response.ok || !payload.publicId) {
+        setError(payload.message || t.submitError);
         setSubmitting(false);
         return;
       }
 
-      setResult(payload.publicId.trim());
+      setResult(payload.publicId);
       setSubmitting(false);
-    } catch (submissionError) {
-      console.error("Unexpected incident submission error", submissionError);
+    } catch {
       setError(t.submitError);
       setSubmitting(false);
     }
   }
 
+  function resetForm() {
+    setDivisionId("");
+    setDistrictId("");
+    setCategoryId("");
+    setIncidentDate("");
+    setError(null);
+    setResult(null);
+    setTitleLength(0);
+    setDescriptionLength(0);
+    setCopied(false);
+  }
+
+  async function copyPublicId() {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Ignore clipboard write failures.
+    }
+  }
+
   if (result) {
     return (
-      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-9" role="status" aria-live="polite">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-2xl font-semibold text-white" aria-hidden="true">
-          ✓
+      <section className="border border-emerald-200 bg-emerald-50/70 p-6 dark:border-emerald-900/60 dark:bg-emerald-950/30 sm:p-8" aria-live="polite">
+        <div className="flex items-center gap-3 text-emerald-800 dark:text-emerald-300">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-white font-bold">✓</span>
+          <h2 className="text-xl font-bold tracking-tight sm:text-2xl">{t.successTitle}</h2>
         </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">{t.successTitle}</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-emerald-950 sm:text-3xl">{t.successDescription}</h2>
-        <div className="mt-7 rounded-2xl border border-emerald-200 bg-white p-5">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">{t.publicIdLabel}</p>
+        <p className="mt-4 text-sm leading-6 text-emerald-950 dark:text-emerald-200">{t.successDescription}</p>
+        <div className="mt-6 border border-emerald-300 bg-white p-4 dark:border-emerald-800 dark:bg-zinc-900">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{t.publicIdLabel}</span>
             <button
               type="button"
               onClick={copyPublicId}
-              className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
+              className="border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
               aria-label="পাবলিক আইডি কপি করুন"
             >
               {copied ? "কপি হয়েছে" : "কপি করুন"}
             </button>
           </div>
-          <p className="mt-2 break-all font-mono text-lg font-semibold tracking-wide text-zinc-950">{result}</p>
+          <p className="mt-2 break-all font-mono text-lg font-bold tracking-wide text-zinc-950 dark:text-white">{result}</p>
         </div>
-        <p className="mt-5 text-sm leading-6 text-emerald-950/70">
-          এই রেফারেন্স নম্বরটি সংরক্ষণ করুন। এটি আপনার রিপোর্টের গোপন রেফারেন্স নম্বর।
-        </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
             onClick={resetForm}
-            className="h-11 flex-1 rounded-full bg-zinc-950 px-5 text-sm font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
+            className="h-11 flex-1 bg-zinc-950 px-5 text-sm font-semibold text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
           >
             {t.startAnother}
           </button>
           <a
             href="/"
-            className="flex h-11 flex-1 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/20"
+            className="flex h-11 flex-1 items-center justify-center border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800"
           >
             হোমে ফিরুন
           </a>
@@ -231,23 +215,25 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
   }
 
   const today = todayInDhaka();
+  const inputClass = "mt-2 h-12 w-full border border-zinc-300 bg-white px-4 text-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white";
+  const selectClass = "mt-2 h-12 w-full border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white dark:disabled:bg-zinc-900";
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-8" aria-describedby={error ? "incident-submit-error" : undefined}>
-      <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">{t.eyebrow}</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-emerald-950 sm:text-3xl">{t.title}</h2>
-        <p className="mt-3 text-sm leading-6 text-emerald-950/75">{t.description}</p>
-        <div className="mt-5 border-t border-emerald-200/70 pt-5">
-          <h3 className="text-sm font-semibold text-emerald-950">{t.privacyTitle}</h3>
-          <p className="mt-2 text-sm leading-6 text-emerald-950/70">{t.privacyDescription}</p>
+      <div className="border border-emerald-200 bg-emerald-50/60 p-5 dark:border-emerald-900/50 dark:bg-emerald-950/30 sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">{t.eyebrow}</p>
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-emerald-950 dark:text-emerald-100 sm:text-3xl">{t.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-emerald-950/80 dark:text-emerald-200">{t.description}</p>
+        <div className="mt-5 border-t border-emerald-200/70 pt-5 dark:border-emerald-900/50">
+          <h3 className="text-sm font-bold text-emerald-950 dark:text-emerald-200">{t.privacyTitle}</h3>
+          <p className="mt-2 text-sm leading-6 text-emerald-950/70 dark:text-emerald-300/80">{t.privacyDescription}</p>
         </div>
       </div>
 
       <div className="space-y-7">
         <div>
           <div className="flex items-end justify-between gap-4">
-            <label htmlFor="incident-title" className="text-sm font-semibold text-zinc-900">{t.titleLabel}</label>
+            <label htmlFor="incident-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.titleLabel}</label>
             <span className="text-xs tabular-nums text-zinc-400">{titleLength}/200</span>
           </div>
           <input
@@ -257,16 +243,15 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
             minLength={5}
             maxLength={200}
             autoComplete="off"
-            value={undefined}
             onChange={(event) => setTitleLength(event.currentTarget.value.length)}
-            className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+            className={inputClass}
             placeholder={t.titlePlaceholder}
           />
         </div>
 
         <div>
           <div className="flex items-end justify-between gap-4">
-            <label htmlFor="incident-description" className="text-sm font-semibold text-zinc-900">{t.descriptionLabel}</label>
+            <label htmlFor="incident-description" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.descriptionLabel}</label>
             <span className="text-xs tabular-nums text-zinc-400">{descriptionLength}/10000</span>
           </div>
           <textarea
@@ -277,7 +262,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
             maxLength={10000}
             rows={9}
             onChange={(event) => setDescriptionLength(event.currentTarget.value.length)}
-            className="mt-2 w-full resize-y rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm leading-6 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+            className="mt-2 w-full resize-y border border-zinc-300 bg-white px-4 py-3 text-sm leading-6 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white"
             placeholder={t.descriptionPlaceholder}
           />
         </div>
@@ -285,26 +270,25 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
-          <label htmlFor="incident-date" className="text-sm font-semibold text-zinc-900">{t.dateLabel}</label>
-          <input
-            id="incident-date"
+          <label htmlFor="incident_date-trigger" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.dateLabel}</label>
+          <DatePicker
             name="incident_date"
-            type="date"
-            max={today}
-            required
-            className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+            value={incidentDate}
+            onChange={setIncidentDate}
+            placeholder={t.dateLabel}
+            label={t.dateLabel}
           />
         </div>
 
         <div>
-          <label htmlFor="incident-category" className="text-sm font-semibold text-zinc-900">{t.categoryLabel}</label>
+          <label htmlFor="incident-category" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.categoryLabel}</label>
           <select
             id="incident-category"
             name="category_id"
             required
             value={categoryId}
             onChange={(event) => setCategoryId(event.target.value)}
-            className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+            className={selectClass}
           >
             <option value="">{t.categoryPlaceholder}</option>
             {categories.map((category) => (
@@ -316,7 +300,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
-          <label htmlFor="incident-division" className="text-sm font-semibold text-zinc-900">{t.divisionLabel}</label>
+          <label htmlFor="incident-division" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.divisionLabel}</label>
           <select
             id="incident-division"
             name="division_id"
@@ -326,7 +310,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
               setDivisionId(event.target.value);
               setDistrictId("");
             }}
-            className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+            className={selectClass}
           >
             <option value="">{t.divisionPlaceholder}</option>
             {divisions.map((division) => (
@@ -336,7 +320,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
         </div>
 
         <div>
-          <label htmlFor="incident-district" className="text-sm font-semibold text-zinc-900">{t.districtLabel}</label>
+          <label htmlFor="incident-district" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.districtLabel}</label>
           <select
             id="incident-district"
             name="district_id"
@@ -344,7 +328,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
             value={districtId}
             onChange={(event) => setDistrictId(event.target.value)}
             disabled={!divisionId}
-            className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:cursor-not-allowed disabled:bg-zinc-100"
+            className={selectClass}
           >
             <option value="">{t.districtPlaceholder}</option>
             {availableDistricts.map((district) => (
@@ -354,9 +338,9 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-stone-50 p-5 sm:p-6">
-        <h3 className="text-sm font-semibold text-zinc-950">{t.guidanceTitle}</h3>
-        <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-600">
+      <div className="border border-zinc-200 bg-stone-50 p-5 dark:border-zinc-800 dark:bg-zinc-950 sm:p-6">
+        <h3 className="text-sm font-bold text-zinc-950 dark:text-white">{t.guidanceTitle}</h3>
+        <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
           <li>• {t.guidanceOne}</li>
           <li>• {t.guidanceTwo}</li>
           <li>• {t.guidanceThree}</li>
@@ -364,7 +348,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
       </div>
 
       {error ? (
-        <div id="incident-submit-error" role="alert" aria-live="assertive" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+        <div id="incident-submit-error" role="alert" aria-live="assertive" className="border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300">
           {error}
         </div>
       ) : null}
@@ -372,7 +356,7 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
       <button
         type="submit"
         disabled={submitting || !categoryId || !divisionId || !districtId}
-        className="h-12 w-full rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950/20 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500"
+        className="h-12 w-full bg-zinc-950 px-6 text-sm font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600"
       >
         {submitting ? t.submitting : t.submit}
       </button>

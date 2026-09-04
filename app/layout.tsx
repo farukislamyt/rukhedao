@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Cinzel } from "next/font/google";
 
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
@@ -17,6 +17,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
     variable: "--font-geist-mono",
     subsets: ["latin"],
+    display: "swap",
+});
+
+const cinzel = Cinzel({
+    variable: "--font-cinzel",
+    subsets: ["latin"],
+    weight: ["700", "900"],
     display: "swap",
 });
 
@@ -78,7 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html
             lang="bn"
-            className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+            className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} h-full antialiased`}
         >
             <head>
                 <Script

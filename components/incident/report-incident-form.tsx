@@ -82,7 +82,7 @@ export function ReportIncidentForm({ publicId, labels: t }: Props) {
   return (
     <form onSubmit={submit} className="space-y-5">
       <div>
-        <label htmlFor="incident-report-reason" className="text-sm font-semibold text-zinc-900">
+        <label htmlFor="incident-report-reason" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
           {t.reason}
         </label>
         <select
@@ -90,7 +90,7 @@ export function ReportIncidentForm({ publicId, labels: t }: Props) {
           required
           value={reason}
           onChange={(event) => setReason(event.target.value)}
-          className="mt-2 h-12 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+          className="mt-2 h-12 w-full border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white"
         >
           <option value="">{t.reasonPlaceholder}</option>
           {reasons.map((value) => (
@@ -102,7 +102,7 @@ export function ReportIncidentForm({ publicId, labels: t }: Props) {
       </div>
 
       <div>
-        <label htmlFor="incident-report-description" className="text-sm font-semibold text-zinc-900">
+        <label htmlFor="incident-report-description" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
           {t.description}
         </label>
         <textarea
@@ -111,18 +111,18 @@ export function ReportIncidentForm({ publicId, labels: t }: Props) {
           onChange={(event) => setDescription(event.target.value)}
           maxLength={2000}
           rows={5}
-          className="mt-2 w-full resize-y rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm leading-6 outline-none placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10"
+          className="mt-2 w-full resize-y border border-zinc-300 bg-white px-4 py-3 text-sm leading-6 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white"
           placeholder={t.descriptionPlaceholder}
         />
       </div>
 
       {message === "success" && (
-        <p role="status" aria-live="polite" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-800">
+        <p role="status" aria-live="polite" className="border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300">
           {t.success}
         </p>
       )}
       {message === "error" && (
-        <p role="alert" aria-live="assertive" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+        <p role="alert" aria-live="assertive" className="border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300">
           {t.error}
         </p>
       )}
@@ -130,7 +130,7 @@ export function ReportIncidentForm({ publicId, labels: t }: Props) {
       <button
         type="submit"
         disabled={submitting || !reason}
-        className="h-11 w-full rounded-full border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400"
+        className="h-11 w-full border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:text-zinc-600"
       >
         {submitting ? t.submitting : t.submit}
       </button>
