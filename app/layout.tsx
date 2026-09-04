@@ -11,11 +11,13 @@ import "./globals.css";
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
+    display: "swap",
 });
 
 const geistMono = Geist_Mono({
     variable: "--font-geist-mono",
     subsets: ["latin"],
+    display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -81,9 +83,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <head>
                 <Script
                     src="https://www.googletagmanager.com/gtag/js?id=G-R6V66VE4BT"
-                    strategy="afterInteractive"
+                    strategy="lazyOnload"
                 />
-                <Script id="google-analytics" strategy="afterInteractive">
+                <Script id="google-analytics" strategy="lazyOnload">
                     {`
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}
@@ -94,16 +96,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </Script>
             </head>
             <body className="min-h-full flex flex-col">
-                <Script
-                    src="https://www.googletagmanager.com/gtag/js?id=G-R6V66VE4BT"
-                    strategy="afterInteractive"
-                />
-                <Script id="google-analytics" strategy="afterInteractive">
-                    {`window.dataLayer = window.dataLayer || [];
-function gtag(){window.dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-R6V66VE4BT');`}
-                </Script>
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

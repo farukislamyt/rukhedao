@@ -48,29 +48,28 @@ export async function getRelatedPublishedIncidents(
     limit = 6,
 ): Promise<RelatedIncident[]> {
     const supabase = await createClient();
-    const queries = [
-        incident.category_slug
-            ? supabase.from("public_incidents").select(RELATED_FIELDS).eq("category_slug", incident.category_slug).neq("public_id", incident.public_id ?? "").order("published_at", { ascending: false }).limit(18)
-            : Promise.resolve({ data: [], error: null }),
-        incident.district_slug
-            ? supabase.from("public_incidents").select(RELATED_FIELDS).eq("district_slug", incident.district_slug).neq("public_id", incident.public_id ?? "").order("published_at", { ascending: false }).limit(18)
-            : Promise.resolve({ data: [], error: null }),
-        incident.division_slug
-            ? supabase.from("public_incidents").select(RELATED_FIELDS).eq("division_slug", incident.division_slug).neq("public_id", incident.public_id ?? "").order("published_at", { ascending: false }).limit(18)
-            : Promise.resolve({ data: [], error: null }),
-        supabase.from("public_incidents").select(RELATED_FIELDS).neq("public_id", incident.public_id ?? "").order("published_at", { ascending: false }).limit(12),
-    ];
+    const orConditions = [
+        incident.category_slug ? `category_slug.eq.${incident.category_slug}` : null,
+        incident.district_slug ? `district_slug.eq.${incident.district_slug}` : null,
+        incident.division_slug ? `division_slug.eq.${incident.division_slug}` : null,
+    ].filter(Boolean);
 
-    const results = await Promise.all(queries);
-    const candidates = new Map<string, RelatedIncident>();
-    for (const result of results) {
-        if (result.error) continue;
-        for (const item of (result.data ?? []) as RelatedIncident[]) {
-            if (item.public_id && !candidates.has(item.public_id)) candidates.set(item.public_id, item);
-        }
+    let query = supabase
+        .from("public_incidents")
+        .select(RELATED_FIELDS)
+        .neq("public_id", incident.public_id ?? "");
+
+    if (orConditions.length > 0) {
+        query = query.or(orConditions.join(","));
     }
 
-    return [...candidates.values()]
+    const { data, error } = await query
+        .order("published_at", { ascending: false })
+        .limit(36);
+
+    if (error || !data) return [];
+
+    return (data as RelatedIncident[])
         .map((item) => {
             let score = 0;
             if (incident.category_slug && item.category_slug === incident.category_slug) score += 50;

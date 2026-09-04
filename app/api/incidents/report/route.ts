@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 type ReportBody = {
   publicId?: unknown;
@@ -43,6 +44,15 @@ function reader() {
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`report:${ip}`, 10, 15 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { message: "Too many report attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const contentType = request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();
     if (contentType !== "application/json") {
       return NextResponse.json({ message: "Invalid request format." }, { status: 415 });
@@ -95,8 +105,6 @@ export async function POST(request: Request) {
       });
     }
 
-    // Fallback uses a stateless publishable client, so it always executes as
-    // the anonymous API role rather than inheriting a visitor/admin session.
     const anonymousClient = reader();
     if (!anonymousClient) {
       return NextResponse.json({ message: "Unable to submit the report right now. Please try again later." }, { status: 503 });

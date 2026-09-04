@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 type SubmissionBody = {
   title?: unknown;
@@ -55,6 +56,15 @@ function makePublicId() {
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`submit:${ip}`, 5, 15 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { message: "Too many submission attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const contentType = request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();
     if (contentType !== "application/json") {
       return NextResponse.json({ message: "Invalid request format." }, { status: 415 });
@@ -120,9 +130,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "The selected incident reference is no longer available. Please refresh and try again." }, { status: 400 });
     }
 
-    // The frozen database contract does not grant the anonymous API role execute
-    // access to the creation RPC. Keep the write server-side and expose only the
-    // validated incident fields; never expose the service-role key to clients.
     const serviceRole = createServiceRoleClient();
     if (serviceRole) {
       const publicId = makePublicId();
@@ -150,8 +157,6 @@ export async function POST(request: Request) {
       });
     }
 
-    // Keep the frozen RPC as a compatibility path if the deployment does not
-    // have a service-role key configured.
     const rpcResult = await read.rpc("create_anonymous_incident", {
       p_title: title,
       p_description: description,

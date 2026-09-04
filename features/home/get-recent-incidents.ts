@@ -8,7 +8,7 @@ export async function getRecentPublishedIncidents(limit = 3): Promise<PublicInci
 
     const { data, error } = await supabase
         .from("public_incidents")
-        .select("*")
+        .select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at")
         .order("published_at", { ascending: false })
         .limit(limit);
 
@@ -17,5 +17,5 @@ export async function getRecentPublishedIncidents(limit = 3): Promise<PublicInci
         return [];
     }
 
-    return data ?? [];
+    return (data ?? []) as PublicIncident[];
 }

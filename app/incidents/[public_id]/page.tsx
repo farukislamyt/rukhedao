@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,11 +19,23 @@ function formatDate(value: string | null) {
     return new Intl.DateTimeFormat("bn-BD", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Dhaka" }).format(new Date(`${value}T00:00:00+06:00`));
 }
 
+const getPublicIncident = cache(async (public_id: string): Promise<PublicIncident | null> => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("public_incidents")
+        .select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at")
+        .eq("public_id", public_id)
+        .maybeSingle();
+
+    if (error || !data) return null;
+    return data as PublicIncident;
+});
+
 export async function generateMetadata({ params }: { params: Promise<{ public_id: string }> }): Promise<Metadata> {
     const { public_id } = await params;
-    const supabase = await createClient();
-    const { data } = await supabase.from("public_incidents").select("title,description,category,division,district,incident_date,published_at").eq("public_id", public_id).maybeSingle();
+    const data = await getPublicIncident(public_id);
     if (!data) return { title: SITE_NAME };
+
     const location = [data.district, data.division].filter(Boolean).join(", ");
     const date = formatDate(data.incident_date);
     const details = [location, date].filter(Boolean).join(" · ");
@@ -42,14 +55,14 @@ export async function generateMetadata({ params }: { params: Promise<{ public_id
 
 export default async function IncidentDetailPage({ params }: { params: Promise<{ public_id: string }> }) {
     const { public_id } = await params;
-    const supabase = await createClient();
-    const [{ data, error }, ledgers] = await Promise.all([
-        supabase.from("public_incidents").select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at").eq("public_id", public_id).maybeSingle(),
+    const [data, ledgers] = await Promise.all([
+        getPublicIncident(public_id),
         getHomeLedgerData(),
     ]);
-    if (error || !data) notFound();
 
-    const incident = data as PublicIncident;
+    if (!data) notFound();
+
+    const incident = data;
     const relatedIncidents = await getRelatedPublishedIncidents(incident, 6);
     const location = [incident.district, incident.division].filter(Boolean).join(", ");
     const path = `/incidents/${encodeURIComponent(incident.public_id ?? public_id)}`;

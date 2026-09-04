@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -11,7 +12,7 @@ export type StaffSession = {
   staff: AdminUser;
 };
 
-export async function getCurrentStaff(): Promise<StaffSession | null> {
+export const getCurrentStaff = cache(async (): Promise<StaffSession | null> => {
   try {
     const supabase = await createClient();
     const {
@@ -45,4 +46,4 @@ export async function getCurrentStaff(): Promise<StaffSession | null> {
     console.error("Failed to check staff session", error);
     return null;
   }
-}
+});

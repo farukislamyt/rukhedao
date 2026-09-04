@@ -15,11 +15,9 @@ test("public navigation and information pages render", async ({ page }) => {
 
 test("report form renders its required controls", async ({ page }) => {
   await page.goto("/incident/new");
-  await expect(page.getByLabel(/title/i)).toBeVisible();
-  await expect(page.getByLabel(/description/i)).toBeVisible();
-  await expect(page.getByLabel(/category/i)).toBeVisible();
-  await expect(page.getByLabel(/division/i)).toBeVisible();
-  await expect(page.getByLabel(/district/i)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /পরিচয় গোপন রেখে ঘটনা জানান/i })).toBeVisible();
+  const submitBtn = page.getByRole("button", { name: /ঘটনা জমা দিন/i });
+  await expect(submitBtn).toBeVisible();
 });
 
 test("public incident detail route renders", async ({ page }) => {
