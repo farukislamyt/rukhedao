@@ -1,6 +1,6 @@
 export type RevisionLike = {
   title: string;
-  description: string;
+  description?: string;
   category_id: string;
   division_id: number;
   district_id: number;
