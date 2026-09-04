@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
@@ -77,6 +78,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             lang="bn"
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
+            <head>
+                <Script
+                    src="https://www.googletagmanager.com/gtag/js?id=G-R6V66VE4BT"
+                    strategy="afterInteractive"
+                />
+                <Script id="google-analytics" strategy="afterInteractive">
+                    {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+
+                        gtag('config', 'G-R6V66VE4BT');
+                    `}
+                </Script>
+            </head>
             <body className="min-h-full flex flex-col">
                 <script
                     type="application/ld+json"
