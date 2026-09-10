@@ -88,12 +88,12 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
             <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mx-auto max-w-7xl px-4 py-3 lg:px-6">
+                <div className="mx-auto max-w-[96rem] px-4 py-3 lg:px-6">
                     <Breadcrumbs items={[{ label: "প্রকাশিত ঘটনা" }]} homeLabel="প্রচ্ছদ" />
                 </div>
             </section>
-            <section className="mx-auto max-w-7xl px-4 py-6 lg:px-6 lg:py-8">
-                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+            <section className="mx-auto max-w-[96rem] px-4 py-6 lg:px-6 lg:py-8">
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
                     <div>
                         <div className="mb-5">
                             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">জনসাধারণের নথি</p>
@@ -137,7 +137,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
                                         </Link>
                                     )}
                                 </div>
-                                <div className="grid gap-4 md:grid-cols-2">
+                                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                                     {incidents.map((incident) => (
                                         <IncidentCard key={incident.public_id} incident={incident} />
                                     ))}

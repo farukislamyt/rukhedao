@@ -53,7 +53,7 @@ export function MobileNavMenu({ homeLabel, incidentsLabel, reportLabel }: Props)
           id="mobile-navigation"
           className="absolute inset-x-0 top-full border-b border-zinc-200 bg-white px-4 pb-5 pt-3 shadow-lg dark:border-zinc-800 dark:bg-zinc-950"
         >
-          <nav aria-label="মোবাইল নেভিগেশন" className="mx-auto flex w-full max-w-7xl flex-col gap-1">
+          <nav aria-label="মোবাইল নেভিগেশন" className="mx-auto flex w-full max-w-[96rem] flex-col gap-1">
             <Link
               href="/"
               onClick={closeMenu}

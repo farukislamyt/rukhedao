@@ -21,13 +21,13 @@ export async function InformationPage({ page }: { page: Page }) {
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
             <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mx-auto max-w-7xl px-4 py-3 lg:px-6">
+                <div className="mx-auto max-w-[96rem] px-4 py-3 lg:px-6">
                     <Breadcrumbs items={[{ label: content.title }]} homeLabel="প্রচ্ছদ" />
                 </div>
             </section>
             <section>
-                <div className="mx-auto max-w-7xl px-4 py-6 lg:px-6 lg:py-8">
-                    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+                <div className="mx-auto max-w-[96rem] px-4 py-6 lg:px-6 lg:py-8">
+                    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
                         <div>
                             <div className="mb-5">
                                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">{content.eyebrow}</p>

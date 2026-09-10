@@ -4,7 +4,7 @@ import { MobileNavMenu } from "@/components/layout/mobile-nav-menu";
 export function Navbar() {
     return (
         <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/90 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/90">
-            <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" aria-label="প্রধান নেভিগেশন">
+            <nav className="mx-auto flex h-16 w-full max-w-[96rem] items-center justify-between px-4 sm:px-6 lg:px-8" aria-label="প্রধান নেভিগেশন">
                 <Link href="/" className="group flex items-center gap-2.5">
                     <span className="relative flex h-2.5 w-2.5 shrink-0">
                         <span className="absolute inline-flex h-full w-full animate-ping bg-emerald-400 opacity-75" />

@@ -17,7 +17,7 @@ export function AdminNavbar({ staff }: Props) {
   }
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
-      <div className="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-4 px-6 py-3 lg:px-8">
+      <div className="mx-auto flex min-h-16 w-full max-w-[96rem] items-center justify-between gap-4 px-6 py-3 lg:px-8">
         <div className="flex items-center gap-6">
           <Link href="/admin" className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
             <span>রুখেদাও</span><span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">{staff.role === "admin" ? "অ্যাডমিন" : "মডারেটর"}</span>

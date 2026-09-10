@@ -52,7 +52,7 @@ export default async function AdminIncidentDetailPage({ params }: { params: Prom
   const revisionDiff = diffIncidentRevisions(previous, latest);
   const duplicateCandidates = candidates.map(candidate => ({ candidate, score: similarityScore(incident, candidate) })).filter(item => item.score >= 65).sort((a, b) => b.score - a.score).slice(0, 5);
 
-  return <main className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+  return <main className="mx-auto max-w-[96rem] px-6 py-10 lg:px-8">
     <div className="mb-6"><Link href="/admin" className="text-xs font-semibold text-zinc-500">← মডারেশন সারিতে ফিরে যান</Link></div>
     <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
       <div className="space-y-8">
