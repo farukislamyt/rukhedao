@@ -48,31 +48,31 @@ export async function POST(request: Request) {
     const rateLimit = checkRateLimit(`report:${ip}`, 10, 15 * 60 * 1000);
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { message: "Too many report attempts. Please try again later." },
+        { message: "অনেকবার জানানোর চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।" },
         { status: 429 }
       );
     }
 
     const contentType = request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();
     if (contentType !== "application/json") {
-      return NextResponse.json({ message: "Invalid request format." }, { status: 415 });
+      return NextResponse.json({ message: "অনুরোধের ধরন সঠিক নয়।" }, { status: 415 });
     }
 
     const contentLength = request.headers.get("content-length");
     if (contentLength && Number.isFinite(Number(contentLength)) && Number(contentLength) > MAX_BODY_BYTES) {
-      return NextResponse.json({ message: "The submitted report is too large." }, { status: 413 });
+      return NextResponse.json({ message: "জমা দেওয়া প্রতিক্রিয়ার আকার অনেক বড়।" }, { status: 413 });
     }
 
     const rawBody = await request.text();
     if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
-      return NextResponse.json({ message: "The submitted report is too large." }, { status: 413 });
+      return NextResponse.json({ message: "জমা দেওয়া প্রতিক্রিয়ার আকার অনেক বড়।" }, { status: 413 });
     }
 
     let body: ReportBody;
     try {
       body = JSON.parse(rawBody) as ReportBody;
     } catch {
-      return NextResponse.json({ message: "Invalid request body." }, { status: 400 });
+      return NextResponse.json({ message: "অনুরোধের তথ্য সঠিক নয়।" }, { status: 400 });
     }
 
     const publicId = typeof body.publicId === "string" ? body.publicId.trim() : "";
@@ -80,11 +80,11 @@ export async function POST(request: Request) {
     const description = typeof body.description === "string" ? body.description.trim() : "";
 
     if (!publicId || publicId.length > 100 || !reasons.includes(reason as ReportReason)) {
-      return NextResponse.json({ message: "Please provide a valid report reason." }, { status: 400 });
+      return NextResponse.json({ message: "সঠিক কারণ বেছে নিন।" }, { status: 400 });
     }
 
     if (description && (description.length < 5 || description.length > 2000)) {
-      return NextResponse.json({ message: "Please provide a valid report description." }, { status: 400 });
+      return NextResponse.json({ message: "সঠিক বিবরণ লিখুন।" }, { status: 400 });
     }
 
     const serviceRole = createServiceRoleClient();
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
 
     const anonymousClient = reader();
     if (!anonymousClient) {
-      return NextResponse.json({ message: "Unable to submit the report right now. Please try again later." }, { status: 503 });
+      return NextResponse.json({ message: "এই মুহূর্তে প্রতিক্রিয়া জমা দেওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।" }, { status: 503 });
     }
 
     const { data, error } = await anonymousClient.rpc("submit_incident_report", {
@@ -121,12 +121,12 @@ export async function POST(request: Request) {
         code: error?.code,
         message: error?.message,
       });
-      return NextResponse.json({ message: "Unable to submit the report right now. Please try again later." }, { status: 503 });
+      return NextResponse.json({ message: "এই মুহূর্তে প্রতিক্রিয়া জমা দেওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।" }, { status: 503 });
     }
 
     return NextResponse.json({ reportId: data }, { status: 201 });
   } catch (error) {
     console.error("Public incident report route failed", error);
-    return NextResponse.json({ message: "Unable to submit the report right now. Please try again later." }, { status: 500 });
+    return NextResponse.json({ message: "এই মুহূর্তে প্রতিক্রিয়া জমা দেওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।" }, { status: 500 });
   }
 }

@@ -60,31 +60,31 @@ export async function POST(request: Request) {
     const rateLimit = checkRateLimit(`submit:${ip}`, 5, 15 * 60 * 1000);
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { message: "Too many submission attempts. Please try again later." },
+        { message: "অনেকবার জমা দেওয়ার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।" },
         { status: 429 }
       );
     }
 
     const contentType = request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();
     if (contentType !== "application/json") {
-      return NextResponse.json({ message: "Invalid request format." }, { status: 415 });
+      return NextResponse.json({ message: "অনুরোধের ধরন সঠিক নয়।" }, { status: 415 });
     }
 
     const contentLength = request.headers.get("content-length");
     if (contentLength && Number.isFinite(Number(contentLength)) && Number(contentLength) > MAX_BODY_BYTES) {
-      return NextResponse.json({ message: "The submitted incident is too large." }, { status: 413 });
+      return NextResponse.json({ message: "জমা দেওয়া ঘটনার আকার অনেক বড়।" }, { status: 413 });
     }
 
     const rawBody = await request.text();
     if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
-      return NextResponse.json({ message: "The submitted incident is too large." }, { status: 413 });
+      return NextResponse.json({ message: "জমা দেওয়া ঘটনার আকার অনেক বড়।" }, { status: 413 });
     }
 
     let body: SubmissionBody;
     try {
       body = JSON.parse(rawBody) as SubmissionBody;
     } catch {
-      return NextResponse.json({ message: "Invalid request body." }, { status: 400 });
+      return NextResponse.json({ message: "অনুরোধের তথ্য সঠিক নয়।" }, { status: 400 });
     }
 
     const title = typeof body.title === "string" ? body.title.trim() : "";
@@ -103,15 +103,15 @@ export async function POST(request: Request) {
       !Number.isInteger(divisionId) ||
       !Number.isInteger(districtId)
     ) {
-      return NextResponse.json({ message: "Please complete all required incident fields." }, { status: 400 });
+      return NextResponse.json({ message: "প্রয়োজনীয় সব তথ্য পূরণ করুন।" }, { status: 400 });
     }
 
     if (!validDate(incidentDate)) {
-      return NextResponse.json({ message: "Please enter a valid incident date." }, { status: 400 });
+      return NextResponse.json({ message: "সঠিক ঘটনার তারিখ দিন।" }, { status: 400 });
     }
 
     if (incidentDate > today()) {
-      return NextResponse.json({ message: "The incident date cannot be in the future." }, { status: 400 });
+      return NextResponse.json({ message: "ভবিষ্যতের তারিখ দেওয়া যাবে না।" }, { status: 400 });
     }
 
     const read = reader();
@@ -123,11 +123,11 @@ export async function POST(request: Request) {
 
     if (category.error || division.error || district.error) {
       console.error("Incident reference lookup failed", { category: category.error, division: division.error, district: district.error });
-      return NextResponse.json({ message: "Incident reference data is temporarily unavailable. Please refresh and try again." }, { status: 503 });
+      return NextResponse.json({ message: "তথ্য এই মুহূর্তে পাওয়া যাচ্ছে না। পৃষ্ঠাটি রিফ্রেশ করে আবার চেষ্টা করুন।" }, { status: 503 });
     }
 
     if (!category.data || !division.data || !district.data) {
-      return NextResponse.json({ message: "The selected incident reference is no longer available. Please refresh and try again." }, { status: 400 });
+      return NextResponse.json({ message: "বেছে নেওয়া তথ্যটি আর পাওয়া যাচ্ছে না। পৃষ্ঠাটি রিফ্রেশ করে আবার চেষ্টা করুন।" }, { status: 400 });
     }
 
     const serviceRole = createServiceRoleClient();
@@ -175,9 +175,9 @@ export async function POST(request: Request) {
       message: rpcResult.error?.message,
     });
 
-    return NextResponse.json({ message: "Unable to submit the incident right now. Please try again later." }, { status: 503 });
+    return NextResponse.json({ message: "এই মুহূর্তে ঘটনা জমা দেওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।" }, { status: 503 });
   } catch (error) {
     console.error("Anonymous incident submission route failed", error);
-    return NextResponse.json({ message: "Unable to submit the incident right now. Please try again later." }, { status: 500 });
+    return NextResponse.json({ message: "এই মুহূর্তে ঘটনা জমা দেওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।" }, { status: 500 });
   }
 }
