@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { IncidentCard } from "@/components/incident/incident-card";
 import { IncidentLedgerSidebar } from "@/components/incident/incident-ledger-sidebar";
 import { getHomeLedgerData } from "@/features/home/get-home-ledgers";
 import { getRecentPublishedIncidents } from "@/features/home/get-recent-incidents";
+import { SITE_DESCRIPTION } from "@/lib/seo";
+
+export const metadata: Metadata = {
+    title: "রুখেদাও — যা ঘটেছে, তা নথিভুক্ত হোক",
+    description: SITE_DESCRIPTION,
+    alternates: { canonical: "/" },
+    robots: { index: true, follow: true },
+    openGraph: { title: "রুখেদাও — যা ঘটেছে, তা নথিভুক্ত হোক", description: SITE_DESCRIPTION, type: "website", locale: "bn_BD", url: "/" },
+};
 
 export default async function HomePage() {
     const [incidents, ledgers] = await Promise.all([getRecentPublishedIncidents(20), getHomeLedgerData()]);
@@ -12,19 +22,19 @@ export default async function HomePage() {
         <main className="flex-1 bg-stone-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
             <section className="relative overflow-hidden border-b border-zinc-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-950">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(24,24,27,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(24,24,27,0.035)_1px,transparent_1px)] bg-[size:48px_48px] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)]" />
-                <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.08fr_.92fr] lg:px-8 lg:py-24">
+                <div className="relative mx-auto grid w-full max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1.08fr_.92fr] lg:px-6 lg:py-14">
                     <div className="max-w-3xl">
-                        <div className="mb-7 inline-flex items-center gap-2 border border-zinc-300 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-600 backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/80 dark:text-zinc-300">
+                        <div className="mb-4 inline-flex items-center gap-2 border border-zinc-300 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-600 backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/80 dark:text-zinc-300">
                             <span className="h-1.5 w-1.5 bg-emerald-600 dark:bg-emerald-400" />
                             পরিচয় গোপন রেখে জনস্বার্থের ঘটনা জানান
                         </div>
                         <h1 className="max-w-3xl text-5xl font-semibold leading-[1.02] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
                             যা ঘটেছে, তা নথিভুক্ত হোক।
                         </h1>
-                        <p className="mt-7 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400 sm:text-xl">
+                        <p className="mt-4 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400 sm:text-xl">
                             রুখেদাও পরিচয় গোপন রেখে গুরুত্বপূর্ণ ঘটনা জানানো, পর্যালোচনা, যাচাই এবং জনসাধারণের জন্য নথিভুক্ত করার সুযোগ দেয়।
                         </p>
-                        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                             <Link
                                 href="/incident/new"
                                 className="inline-flex h-12 items-center justify-center bg-zinc-950 px-6 text-sm font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
@@ -41,13 +51,13 @@ export default async function HomePage() {
                     </div>
 
                     <div className="relative mx-auto w-full max-w-lg lg:justify-self-end">
-                        <div className="border border-zinc-300 bg-white p-3 shadow-[0_24px_70px_rgba(24,24,27,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
-                            <div className="border border-zinc-200 bg-stone-50 p-6 dark:border-zinc-800 dark:bg-zinc-950 sm:p-8">
-                                <div className="flex items-center justify-between border-b border-zinc-200 pb-5 dark:border-zinc-800">
+                        <div className="border border-zinc-300 bg-white p-2 shadow-[0_24px_70px_rgba(24,24,27,0.12)] dark:border-zinc-800 dark:bg-zinc-900">
+                            <div className="border border-zinc-200 bg-stone-50 p-4 dark:border-zinc-800 dark:bg-zinc-950 sm:p-5">
+                                <div className="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-800">
                                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">জনসাধারণের নথি</span>
                                     <span className="bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">প্রকাশিত</span>
                                 </div>
-                                <div className="mt-7 space-y-6">
+                                <div className="mt-4 space-y-4">
                                     <div>
                                         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-400">পরিচিতি নম্বর</p>
                                         <p className="mt-2 font-mono text-sm text-zinc-700 dark:text-zinc-300">RK-XXXXXXXXXXXX</p>
@@ -75,8 +85,8 @@ export default async function HomePage() {
             </section>
 
             <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-                    <div className="mb-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <div className="mx-auto max-w-7xl px-4 py-10 lg:px-6">
+                    <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">জনসাধারণের নথি</p>
                             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">সাম্প্রতিক প্রকাশিত ঘটনা</h2>
@@ -85,10 +95,10 @@ export default async function HomePage() {
                             সব ঘটনা দেখুন →
                         </Link>
                     </div>
-                    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+                    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
                         <div>
                             {incidents.length > 0 ? (
-                                <div className="grid gap-5 md:grid-cols-2">
+                                <div className="grid gap-4 md:grid-cols-2">
                                     {incidents.map((incident) => (
                                         <IncidentCard key={incident.public_id} incident={incident} />
                                     ))}

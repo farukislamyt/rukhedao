@@ -29,12 +29,12 @@ export default async function NewIncidentPage() {
 
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
-            <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"><div className="mx-auto max-w-7xl px-6 py-5 lg:px-8"><Breadcrumbs items={[{ label: "ঘটনা জানান" }]} homeLabel="প্রচ্ছদ" /></div></section>
-            <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
-                <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+            <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"><div className="mx-auto max-w-7xl px-4 py-3 lg:px-6"><Breadcrumbs items={[{ label: "ঘটনা জানান" }]} homeLabel="প্রচ্ছদ" /></div></section>
+            <section className="mx-auto max-w-7xl px-4 py-6 lg:px-6 lg:py-8">
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
                     <div>
-                        <div className="mb-8"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">ঘটনা জানান</p><h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">পরিচয় গোপন রেখে ঘটনা জানান</h1><p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg">জনস্বার্থের গুরুত্বপূর্ণ ঘটনা সহজভাবে জানান। কোনো অ্যাকাউন্ট বা প্রোফাইলের প্রয়োজন নেই।</p></div>
-                        <div className="border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8 lg:p-10">
+                        <div className="mb-5"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">ঘটনা জানান</p><h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">পরিচয় গোপন রেখে ঘটনা জানান</h1><p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg">জনস্বার্থের গুরুত্বপূর্ণ ঘটনা সহজভাবে জানান। কোনো অ্যাকাউন্ট বা প্রোফাইলের প্রয়োজন নেই।</p></div>
+                        <div className="border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-5">
                             <NewIncidentForm
                                 categories={categoryOptions}
                                 divisions={divisionOptions}

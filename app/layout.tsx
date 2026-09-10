@@ -36,9 +36,6 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     applicationName: SITE_NAME,
     category: "public interest",
-    alternates: {
-        canonical: "/",
-    },
     robots: {
         index: true,
         follow: true,
@@ -48,6 +45,11 @@ export const metadata: Metadata = {
             "max-image-preview": "large",
             "max-snippet": -1,
             "max-video-preview": -1,
+        },
+    },
+    alternates: {
+        types: {
+            "application/rss+xml": `${SITE_URL}/feed.xml`,
         },
     },
     openGraph: {

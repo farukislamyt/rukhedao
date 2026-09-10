@@ -5,6 +5,9 @@ import { InformationPage } from "@/components/content/information-page";
 export const metadata: Metadata = {
     title: "ব্যবহারের শর্ত",
     description: "রুখেদাও ব্যবহারের শর্ত ও দায়িত্ব সম্পর্কে জানুন।",
+    alternates: { canonical: "/terms" },
+    robots: { index: true, follow: true },
+    openGraph: { title: "ব্যবহারের শর্ত", description: "রুখেদাও ব্যবহারের শর্ত ও দায়িত্ব সম্পর্কে জানুন।", type: "website", locale: "bn_BD", url: "/terms" },
 };
 
 export default function TermsPage() {

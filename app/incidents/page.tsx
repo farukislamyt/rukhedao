@@ -88,19 +88,19 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
             <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
+                <div className="mx-auto max-w-7xl px-4 py-3 lg:px-6">
                     <Breadcrumbs items={[{ label: "প্রকাশিত ঘটনা" }]} homeLabel="প্রচ্ছদ" />
                 </div>
             </section>
-            <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
-                <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+            <section className="mx-auto max-w-7xl px-4 py-6 lg:px-6 lg:py-8">
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
                     <div>
-                        <div className="mb-8">
+                        <div className="mb-5">
                             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">জনসাধারণের নথি</p>
                             <h1 className="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">প্রকাশিত ঘটনা</h1>
-                            <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">পর্যালোচনা ও অনুমোদনের পর প্রকাশিত ঘটনাগুলোর নথি দেখুন।</p>
+                            <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">পর্যালোচনা ও অনুমোদনের পর প্রকাশিত ঘটনাগুলোর নথি দেখুন।</p>
                         </div>
-                        <form className="mb-4 grid gap-3 border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 sm:grid-cols-[1fr_auto]" method="get">
+                        <form className="mb-3 grid gap-3 border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900 sm:grid-cols-[1fr_auto]" method="get">
                             <input
                                 name="q"
                                 defaultValue={q}
@@ -129,7 +129,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
                             </div>
                         ) : (
                             <>
-                                <div className="mb-6 mt-8 flex flex-wrap items-center justify-between gap-3">
+                                <div className="mb-4 mt-5 flex flex-wrap items-center justify-between gap-3">
                                     <p className="text-sm text-zinc-500 dark:text-zinc-400">{count ?? incidents.length}টি প্রকাশিত ঘটনা</p>
                                     {hasActiveFilters && (
                                         <Link href="/incidents" className="text-sm font-semibold text-zinc-700 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900 dark:text-zinc-300 dark:hover:decoration-white">
@@ -137,7 +137,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
                                         </Link>
                                     )}
                                 </div>
-                                <div className="grid gap-5 md:grid-cols-2">
+                                <div className="grid gap-4 md:grid-cols-2">
                                     {incidents.map((incident) => (
                                         <IncidentCard key={incident.public_id} incident={incident} />
                                     ))}

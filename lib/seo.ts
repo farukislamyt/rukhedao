@@ -1,4 +1,5 @@
-export const SITE_URL = "https://rukhedao.vercel.app";
+export const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://rukhedao.vercel.app";
 export const SITE_NAME = "রুখেদাও";
 export const SITE_DESCRIPTION =
     "পরিচয় গোপন রেখে জনস্বার্থসংশ্লিষ্ট গুরুত্বপূর্ণ ঘটনা জানানো, যাচাই করা এবং জনসাধারণের জন্য নথিভুক্ত করার প্ল্যাটফর্ম।";

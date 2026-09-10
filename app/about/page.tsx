@@ -5,6 +5,9 @@ import { InformationPage } from "@/components/content/information-page";
 export const metadata: Metadata = {
     title: "রুখেদাও সম্পর্কে",
     description: "রুখেদাও জনস্বার্থের গুরুত্বপূর্ণ ঘটনা জানানো ও নথিভুক্ত করার একটি কমিউনিটি-চালিত প্ল্যাটফর্ম।",
+    alternates: { canonical: "/about" },
+    robots: { index: true, follow: true },
+    openGraph: { title: "রুখেদাও সম্পর্কে", description: "রুখেদাও জনস্বার্থের গুরুত্বপূর্ণ ঘটনা জানানো ও নথিভুক্ত করার একটি কমিউনিটি-চালিত প্ল্যাটফর্ম।", type: "website", locale: "bn_BD", url: "/about" },
 };
 
 export default function AboutPage() {

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/types/database";
 import { absoluteUrl } from "@/lib/seo";
 
 const publicRoutes = [
@@ -28,12 +29,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                   : 0.6,
     }));
 
-    const supabase = await createClient();
+    const supabase = createSupabaseClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    );
     const { data } = await supabase
         .from("public_incidents")
         .select("public_id,published_at")
         .not("public_id", "is", null)
-        .order("published_at", { ascending: false });
+        .order("published_at", { ascending: false })
+        .limit(5000);
 
     const incidentRoutes = (data ?? []).flatMap((incident) => {
         if (!incident.public_id) return [];

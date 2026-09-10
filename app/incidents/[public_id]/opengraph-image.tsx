@@ -111,7 +111,7 @@ export default async function Image({ params }: { params: Promise<{ public_id: s
                         <span>📍 স্থান: {location}</span>
                         {date && <span>📅 তারিখ: {date}</span>}
                     </div>
-                    <div style={{ fontSize: "18px", color: "#a1a1aa" }}>rukhedao.org</div>
+                    <div style={{ fontSize: "18px", color: "#a1a1aa" }}>rukhedao.vercel.app</div>
                 </div>
             </div>
         ),

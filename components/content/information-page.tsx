@@ -21,24 +21,24 @@ export async function InformationPage({ page }: { page: Page }) {
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
             <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
+                <div className="mx-auto max-w-7xl px-4 py-3 lg:px-6">
                     <Breadcrumbs items={[{ label: content.title }]} homeLabel="প্রচ্ছদ" />
                 </div>
             </section>
             <section>
-                <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
-                    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+                <div className="mx-auto max-w-7xl px-4 py-6 lg:px-6 lg:py-8">
+                    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
                         <div>
-                            <div className="mb-8">
+                            <div className="mb-5">
                                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">{content.eyebrow}</p>
-                                <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-6xl">{content.title}</h1>
-                                <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-600 dark:text-zinc-400 sm:text-xl">{content.intro}</p>
+                                <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-6xl">{content.title}</h1>
+                                <p className="mt-4 max-w-3xl text-lg leading-8 text-zinc-600 dark:text-zinc-400 sm:text-xl">{content.intro}</p>
                             </div>
                             <div className="divide-y divide-zinc-200 border border-zinc-200 bg-white shadow-sm dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
                                 {content.sections.map((section) => (
-                                    <article key={section.title} className="p-6 sm:p-8 lg:p-10">
+                                    <article key={section.title} className="p-4 sm:p-5">
                                         <h2 className="text-xl font-semibold tracking-[-0.02em] sm:text-2xl">{section.title}</h2>
-                                        <p className="mt-4 text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg sm:leading-8">{section.body}</p>
+                                        <p className="mt-3 text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg sm:leading-8">{section.body}</p>
                                     </article>
                                 ))}
                             </div>
