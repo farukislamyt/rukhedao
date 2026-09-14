@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { IncidentCard } from "@/components/incident/incident-card";
 import { IncidentFilters } from "@/components/incident/incident-filters";
 import { IncidentLedgerSidebar } from "@/components/incident/incident-ledger-sidebar";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { getCachedCategories, getCachedDivisions, getCachedDistricts } from "@/lib/cache/reference-data";
 import { getHomeLedgerData } from "@/features/home/get-home-ledgers";
-import { createClient } from "@/lib/supabase/server";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
+import type { Database } from "@/types/database";
 import type { Tables } from "@/types/database";
 
 type PublicIncident = Tables<"public_incidents">;
@@ -29,11 +30,18 @@ function safeSearch(value: string) {
     return value.replace(/[(),]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
 }
 
+function getPublicClient() {
+    return createSupabaseClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+    );
+}
+
 const PAGE_SIZE = 24;
 
 export default async function IncidentsPage({ searchParams }: { searchParams: SearchParams }) {
     const filters = await searchParams;
-    const supabase = await createClient();
+    const supabase = getPublicClient();
     const page = Math.max(1, Number(filters.page) || 1);
     const q = safeSearch(filters.q?.trim() ?? "");
 
