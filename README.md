@@ -1,98 +1,133 @@
-# RukheDao
+# RukheDao (রুখে দাও)
 
-RukheDao is a Bengali-only public incident-reporting web application. Visitors can submit incidents anonymously; submitted incidents enter the existing moderation workflow before they become publicly visible.
+RukheDao is a Bengali-focused, privacy-first public-interest incident-reporting web application. People can submit incident information anonymously, while publication remains behind an existing staff moderation workflow.
 
-## Project status
+> **Project status:** The application is complete. The repository is open for maintenance, security, testing, accessibility, documentation, compatibility, and other focused improvements. Product development should not be assumed to be open unless maintainers explicitly reopen it.
 
-The public-facing application, anonymous incident submission flow, and administrative moderation area are implemented. All application routes are served without a language prefix.
+## What RukheDao does
 
-## Core principles
+- Lets the public read published incidents.
+- Accepts incident submissions without a public reporter account.
+- Uses controlled categories and Bangladesh division/district reference data.
+- Routes submissions through staff moderation before publication.
+- Maintains incident revisions and moderation history.
+- Supports public reports about incident content.
+- Separates verification state from moderation status.
 
-- **Bengali-only interface:** Bengali is the sole interface language and UI copy is kept directly in the application source.
-- **Anonymous reporting:** public incident submission does not require a reporter account.
-- **Moderation before publication:** a successful submission is not automatically public.
-- **Frozen database:** the deployed database is a fixed contract. Application code must adapt to it.
-- **Privacy and least privilege:** public users must not receive administrative access or database write privileges beyond the existing controlled submission path.
+### Submission is not publication
 
-## Frozen database rule
+A successful anonymous submission starts in the moderation lifecycle. It does **not** automatically make an incident public.
 
-**Do not modify the database.**
+```text
+Anonymous submission
+        ↓
+     pending
+        ↓
+   under_review
+      ↙      ↘
+needs_revision  approved
+    ↓             ↓
+under_review   publication
+    │
+    └──→ rejected
+```
 
-Do not create Supabase migrations or alter existing tables, columns, constraints, functions, triggers, views, RLS policies, or permissions. Do not add application tables as a workaround for an application-layer issue.
+See [Reporting](docs/REPORTING.md) and [Moderation](docs/MODERATION.md) for the implemented workflow.
 
-Read [`docs/DATABASE.md`](docs/DATABASE.md) before changing database-facing code.
+## Privacy and security model
+
+The public reporting model is intentionally anonymous. The frozen application database does not define a public reporter identity system or reporter identity fields such as user ID, email, phone number, IP address, device identifier, fingerprint, or tracking identifier.
+
+This is an application and database design boundary, not a claim of absolute or untraceable anonymity against every external infrastructure or network observation.
+
+See [Privacy](docs/PRIVACY.md) and [Security](SECURITY.md).
+
+## Frozen database contract
+
+The deployed Supabase/PostgreSQL database is a **frozen contract**. Contributors must not:
+
+- add or remove core tables;
+- rename or repurpose core tables;
+- change columns, constraints, relationships, functions, triggers, RLS policies, or grants;
+- introduce a second database contract;
+- add a public reporter identity model.
+
+The application must adapt to the existing database contract. See [Database](docs/DATABASE.md).
 
 ## Technology
 
 - Next.js 16
+- React 19
 - TypeScript
-- React
 - Supabase / PostgreSQL
+- Tailwind CSS
+- Playwright
+- GitHub Actions
 - Vercel
-
-## Repository structure
-
-```text
-app/          Next.js routes and pages
-components/   Reusable UI components
-features/     Feature-specific application logic
-lib/          Shared clients and utilities
-types/        TypeScript/database types
-supabase/     Existing database definitions
-
-docs/         Project and engineering documentation
-```
 
 ## Local development
 
-Install dependencies and start the development server:
+Requirements: Node.js and npm.
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
-Then open `http://localhost:3000`.
+Open the local URL shown by Next.js. Do not place production secrets in `.env.local` or commit them.
 
-Create local environment variables from `.env.example`. Never commit production secrets or a Supabase service-role key.
+## Verification
 
-## Build verification
-
-Before opening a pull request, run:
+Before submitting a change, run the checks relevant to the work:
 
 ```bash
+npm run lint
+npm run test:unit
 npm run build
 ```
 
-Fix TypeScript and build errors before merging.
+GitHub Actions also runs type checking, linting, unit tests, and the production build for pushes and pull requests targeting `main`.
 
-## Incident workflow
+Read-only Playwright E2E verification is available through the repository's manually triggered E2E workflow.
 
-```text
-Anonymous visitor
-      ↓
-Incident submission
-      ↓
-Pending
-      ↓
-Admin / moderation review
-      ↓
-Existing approval/publication rules
-      ↓
-Public incident
-```
+See [Testing](docs/TESTING.md).
 
-The public application must never treat submission success as equivalent to publication.
+## Contributing
+
+Contributions are welcome when they preserve RukheDao's existing boundaries and are clearly scoped.
+
+Good contribution areas include:
+
+- bug fixes and compatibility maintenance;
+- security improvements;
+- accessibility improvements;
+- tests and verification;
+- documentation improvements;
+- reliability and developer-experience improvements.
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md), then read the relevant project documentation before changing a sensitive workflow.
 
 ## Documentation
 
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution and development rules
-- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — community standards
-- [`SECURITY.md`](SECURITY.md) — security policy and vulnerability reporting
-- [`docs/DATABASE.md`](docs/DATABASE.md) — frozen database contract
+- [Documentation index](docs/README.md)
+- [Project overview](docs/PROJECT.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Reporting workflow](docs/REPORTING.md)
+- [Moderation](docs/MODERATION.md)
+- [Privacy model](docs/PRIVACY.md)
+- [Database contract](docs/DATABASE.md)
+- [Testing](docs/TESTING.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Security hardening](docs/SECURITY_HARDENING.md)
 
-Additional architecture, workflow, deployment, QA, API, and admin documentation should be added as those project areas become stable.
+Repository policies:
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security](SECURITY.md)
+- [License](LICENSE)
 
 ## License
 
-This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
+RukheDao is released under the [MIT License](LICENSE).

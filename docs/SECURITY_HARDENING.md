@@ -1,21 +1,39 @@
 # Security hardening
 
+This document records security-sensitive implementation boundaries that contributors should preserve.
+
 ## Database boundary
 
-The deployed Supabase database is frozen. This work intentionally does not modify the database schema, migrations, RLS policies, functions, triggers, grants, or generated `types/database.ts`.
+The deployed Supabase database is frozen. Application changes must not modify the database schema, migrations, RLS policies, functions, triggers, grants, or generated database types as a shortcut for implementing application behavior.
 
 ## Anonymous incident submission
 
-Public incident creation remains anonymous and does not require an account or reporter profile.
+Public incident creation does not require a public account or reporter profile.
 
-The application uses the existing `create_anonymous_incident` RPC as the sole incident-creation path. The API does not bypass the frozen database contract with a service-role direct insert.
+The submission API:
 
-The HTTP boundary also rejects non-JSON requests and oversized request bodies before database access.
+- applies a per-client-IP application-layer rate limit;
+- requires `application/json`;
+- enforces a 16 KiB request-body limit;
+- validates incident fields and prevents future incident dates;
+- validates category, division, and district references through public-safe database views;
+- uses the configured server-side service-role path when available;
+- otherwise preserves the existing `create_anonymous_incident` RPC path.
+
+The service-role credential is server-side only and must never be exposed to the browser or committed to the repository.
+
+When a server-side insert does not return normally, the API verifies the generated opaque public ID before asking the reporter to retry. This protects against duplicate writes when a database response is lost after commit.
+
+## Reporter privacy boundary
+
+The frozen application database does not model a public reporter identity. Contributors must not add reporter accounts, reporter identity fields, or tracking identifiers to the reporting workflow without an explicit architectural change.
+
+Application-level anonymity should not be described as absolute or untraceable; deployment and network infrastructure can have independent logging and observability behavior.
 
 ## Moderation
 
-Admin status changes continue to require an active staff session and are delegated to the existing database moderation RPC. Database-side workflow rules remain the source of truth.
+Staff status and moderation operations require the existing authenticated staff boundary. Database-side workflow rules remain the source of truth for permitted state changes and publication consistency.
 
 ## Rate limiting
 
-A distributed rate limiter is intentionally not implemented with process-local memory. Vercel serverless instances do not provide a reliable shared counter, and adding a persistent rate-limit store would introduce a new infrastructure dependency. Abuse protection should be added through a supported edge/rate-limit service in a separate application-layer change when the deployment configuration is ready.
+The submission endpoint currently applies a process-local rate limit keyed by the client IP. This is useful as an application-layer abuse-control boundary, but it is not a globally shared distributed limiter across all Vercel instances. A future distributed limiter would be a separate infrastructure change and must not require changing the frozen database contract.
