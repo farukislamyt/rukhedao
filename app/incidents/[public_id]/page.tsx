@@ -2,15 +2,15 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { IncidentCard } from "@/components/incident/incident-card";
 import { IncidentLedgerSidebar } from "@/components/incident/incident-ledger-sidebar";
 import { ReportIncidentForm } from "@/components/incident/report-incident-form";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { getRelatedPublishedIncidents } from "@/features/incidents/get-related-incidents";
 import { getHomeLedgerData } from "@/features/home/get-home-ledgers";
-import { createClient } from "@/lib/supabase/server";
 import { absoluteUrl, cleanDescription, SITE_NAME } from "@/lib/seo";
-import type { Tables } from "@/types/database";
+import type { Database, Tables } from "@/types/database";
 
 type PublicIncident = Tables<"public_incidents">;
 
@@ -19,8 +19,15 @@ function formatDate(value: string | null) {
     return new Intl.DateTimeFormat("bn-BD", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Dhaka" }).format(new Date(`${value}T00:00:00+06:00`));
 }
 
+function getPublicClient() {
+    return createSupabaseClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+    );
+}
+
 const getPublicIncident = cache(async (public_id: string): Promise<PublicIncident | null> => {
-    const supabase = await createClient();
+    const supabase = getPublicClient();
     const { data, error } = await supabase
         .from("public_incidents")
         .select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at")
@@ -55,15 +62,15 @@ export async function generateMetadata({ params }: { params: Promise<{ public_id
 
 export default async function IncidentDetailPage({ params }: { params: Promise<{ public_id: string }> }) {
     const { public_id } = await params;
-    const [data, ledgers] = await Promise.all([
-        getPublicIncident(public_id),
-        getHomeLedgerData(),
-    ]);
+    const data = await getPublicIncident(public_id);
 
     if (!data) notFound();
 
     const incident = data;
-    const relatedIncidents = await getRelatedPublishedIncidents(incident, 6);
+    const [relatedIncidents, ledgers] = await Promise.all([
+        getRelatedPublishedIncidents(incident, 6),
+        getHomeLedgerData(),
+    ]);
     const location = [incident.district, incident.division].filter(Boolean).join(", ");
     const path = `/incidents/${encodeURIComponent(incident.public_id ?? public_id)}`;
     const description = cleanDescription(incident.description);
