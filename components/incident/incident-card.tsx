@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Tables } from "@/types/database";
-import { MapPin, CalendarDays } from "lucide-react";
 
 type IncidentCardProps = {
     incident: Pick<
@@ -56,14 +55,24 @@ export function IncidentCard({ incident }: IncidentCardProps) {
             <div className="mt-auto grid grid-cols-2 gap-3 border-t border-zinc-100 pt-3 text-xs text-zinc-500 dark:border-zinc-800/80">
                 <div className="min-w-0">
                     <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                        <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
+                        <span className="inline-block h-3 w-3 shrink-0" aria-hidden="true">
+                            <span className="relative mx-auto mt-0.5 block h-2.5 w-2.5 rounded-full border-[1.5px] border-current">
+                                <span className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current" />
+                            </span>
+                        </span>
                         স্থান
                     </p>
                     <p className="mt-1 truncate font-semibold text-zinc-800 dark:text-zinc-200">{location || "স্থান উল্লেখ নেই"}</p>
                 </div>
                 <div>
                     <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                        <CalendarDays className="h-3 w-3 shrink-0" aria-hidden="true" />
+                        <span className="inline-block h-3 w-3 shrink-0" aria-hidden="true">
+                            <span className="relative block h-3 w-3 rounded-[2px] border-[1.5px] border-current">
+                                <span className="absolute inset-x-0 top-2 border-t border-current" />
+                                <span className="absolute left-1.5 top-0 h-1 w-px bg-current" />
+                                <span className="absolute right-1.5 top-0 h-1 w-px bg-current" />
+                            </span>
+                        </span>
                         তারিখ
                     </p>
                     <p className="mt-1 font-semibold text-zinc-800 dark:text-zinc-200">{formatDate(incident.incident_date)}</p>
