@@ -71,7 +71,7 @@ export function MobileNavMenu({ homeLabel, incidentsLabel, reportLabel }: Props)
             <Link
               href="/incidents"
               onClick={closeMenu}
-              className="px-4 py-3 text-base font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:hover:bg-zinc-800 dark:focus-visible:ring-white"
+              className="px-4 py-3 text-base font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-white"
             >
               {incidentsLabel}
             </Link>
