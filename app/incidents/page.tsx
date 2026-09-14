@@ -38,6 +38,13 @@ function getPublicClient() {
 
 const PAGE_SIZE = 24;
 
+async function readWithRetry<T>(run: () => PromiseLike<{ data: T; error: unknown }>) {
+    const first = await run();
+    if (!first.error) return first;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return run();
+}
+
 export default async function IncidentsPage({ searchParams }: { searchParams: SearchParams }) {
     const filters = await searchParams;
     const supabase = getPublicClient();
@@ -74,9 +81,9 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
     if (filters.district) query = query.eq("district_slug", filters.district);
 
     const from = (page - 1) * PAGE_SIZE;
-    const { data, error } = await query.range(from, from + PAGE_SIZE - 1);
-    if (error) throw new Error("Unable to load public incidents.");
-    const incidents = (data ?? []) as PublicIncident[];
+    const result = await readWithRetry(() => query.range(from, from + PAGE_SIZE - 1));
+    if (result.error) throw new Error("Unable to load public incidents.");
+    const incidents = (result.data ?? []) as PublicIncident[];
 
     let count = from + incidents.length;
     if (incidents.length === PAGE_SIZE) {
@@ -86,7 +93,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
         if (filters.division) countQuery = countQuery.eq("division_slug", filters.division);
         if (filters.district) countQuery = countQuery.eq("district_slug", filters.district);
 
-        const { count: exactCount, error: countError } = await countQuery;
+        const { count: exactCount, error: countError } = await readWithRetry(() => countQuery);
         if (countError) throw new Error("Unable to count public incidents.");
         count = exactCount ?? count;
     }
