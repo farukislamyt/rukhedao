@@ -15,14 +15,16 @@ type IncidentCardProps = {
     >;
 };
 
+const dateFormatter = new Intl.DateTimeFormat("bn-BD", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Dhaka",
+});
+
 function formatDate(value: string | null) {
     if (!value) return "";
-    return new Intl.DateTimeFormat("bn-BD", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        timeZone: "Asia/Dhaka",
-    }).format(new Date(`${value}T00:00:00+06:00`));
+    return dateFormatter.format(new Date(`${value}T00:00:00+06:00`));
 }
 
 export function IncidentCard({ incident }: IncidentCardProps) {
