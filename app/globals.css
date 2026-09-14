@@ -2,9 +2,27 @@
 
 :root {
   --background: #fafaf9;
-  --foreground: #09090b;
+  --foreground: #18181b;
   --surface: #ffffff;
+  --surface-muted: #f5f5f4;
   --surface-border: #e4e4e7;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --muted: #71717a;
+  --muted-foreground: #a1a1aa;
+  --primary: #18181b;
+  --primary-foreground: #ffffff;
+  --link: #047857;
+  --link-hover: #065f46;
+  --success: #047857;
+  --success-surface: #ecfdf5;
+  --warning: #a16207;
+  --warning-surface: #fefce8;
+  --destructive: #b91c1c;
+  --destructive-surface: #fef2f2;
+  --info: #0369a1;
+  --info-surface: #f0f9ff;
+  --focus: #18181b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -12,15 +30,58 @@
     --background: #09090b;
     --foreground: #f4f4f5;
     --surface: #18181b;
+    --surface-muted: #111113;
     --surface-border: #27272a;
+    --border: #27272a;
+    --border-strong: #3f3f46;
+    --muted: #a1a1aa;
+    --muted-foreground: #71717a;
+    --primary: #fafafa;
+    --primary-foreground: #18181b;
+    --link: #34d399;
+    --link-hover: #6ee7b7;
+    --success: #34d399;
+    --success-surface: #052e1b;
+    --warning: #facc15;
+    --warning-surface: #422006;
+    --destructive: #f87171;
+    --destructive-surface: #450a0a;
+    --info: #38bdf8;
+    --info-surface: #082f49;
+    --focus: #fafafa;
   }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-warning: var(--warning);
+  --color-warning-surface: var(--warning-surface);
+  --color-destructive: var(--destructive);
+  --color-destructive-surface: var(--destructive-surface);
+  --color-info: var(--info);
+  --color-info-surface: var(--info-surface);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -29,7 +90,45 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* RukheDao visual system: use square surfaces throughout the application. */
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.9;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* RukheDao visual system: square surfaces throughout the public UI. */
 *,
 *::before,
 *::after {
