@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { IncidentCard } from "@/components/incident/incident-card";
 import { IncidentFilters } from "@/components/incident/incident-filters";
@@ -168,7 +167,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
                                     <nav className="mt-10 flex items-center justify-between" aria-label="ঘটনার পৃষ্ঠা">
                                         {page > 1 ? (
                                             <Link href={`/incidents?${paramsForPage(page - 1)}`} className="inline-flex items-center gap-2 border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
-                                                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                                                <span aria-hidden="true">←</span>
                                                 আগের
                                             </Link>
                                         ) : (
@@ -178,7 +177,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
                                         {page < totalPages ? (
                                             <Link href={`/incidents?${paramsForPage(page + 1)}`} className="inline-flex items-center gap-2 border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
                                                 পরের
-                                                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                                                <span aria-hidden="true">→</span>
                                             </Link>
                                         ) : (
                                             <span />
