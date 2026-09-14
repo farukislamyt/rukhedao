@@ -8,8 +8,7 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { getCachedCategories, getCachedDivisions, getCachedDistricts } from "@/lib/cache/reference-data";
 import { getHomeLedgerData } from "@/features/home/get-home-ledgers";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
-import type { Database } from "@/types/database";
-import type { Tables } from "@/types/database";
+import type { Database, Tables } from "@/types/database";
 
 type PublicIncident = Tables<"public_incidents">;
 type SearchParams = Promise<{ q?: string; category?: string; division?: string; district?: string; sort?: string; page?: string }>;
@@ -17,25 +16,11 @@ type SearchParams = Promise<{ q?: string; category?: string; division?: string; 
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
     const filters = await searchParams;
     const hasFilters = Boolean(filters.q || filters.category || filters.division || filters.district || filters.sort || (Number(filters.page) || 1) > 1);
-    return {
-        title: "প্রকাশিত ঘটনা",
-        description: "রুখেদাও-তে পর্যালোচনা ও অনুমোদনের পর প্রকাশিত জনস্বার্থসংশ্লিষ্ট ঘটনাগুলোর নথি দেখুন।",
-        alternates: { canonical: "/incidents" },
-        robots: hasFilters ? { index: false, follow: true, googleBot: { index: false, follow: true } } : { index: true, follow: true },
-    };
+    return { title: "প্রকাশিত ঘটনা", description: "রুখেদাও-তে পর্যালোচনা ও অনুমোদনের পর প্রকাশিত জনস্বার্থসংশ্লিষ্ট ঘটনাগুলোর নথি দেখুন।", alternates: { canonical: "/incidents" }, robots: hasFilters ? { index: false, follow: true, googleBot: { index: false, follow: true } } : { index: true, follow: true } };
 }
 
-function safeSearch(value: string) {
-    return value.replace(/[(),]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
-}
-
-function getPublicClient() {
-    return createSupabaseClient<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-    );
-}
-
+function safeSearch(value: string) { return value.replace(/[(),]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120); }
+function getPublicClient() { return createSupabaseClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!); }
 const PAGE_SIZE = 24;
 
 async function readWithRetry<T extends object>(run: () => PromiseLike<T>): Promise<T> {
@@ -50,31 +35,15 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
     const supabase = getPublicClient();
     const page = Math.max(1, Number(filters.page) || 1);
     const q = safeSearch(filters.q?.trim() ?? "");
-
-    const [categories, divisions, districts, ledgers] = await Promise.all([
-        getCachedCategories(),
-        getCachedDivisions(),
-        getCachedDistricts(),
-        getHomeLedgerData(),
-    ]);
+    const [categories, divisions, districts, ledgers] = await Promise.all([getCachedCategories(), getCachedDivisions(), getCachedDistricts(), getHomeLedgerData()]);
 
     const sortOption = filters.sort ?? "published_desc";
     let sortColumn: "published_at" | "incident_date" = "published_at";
     let ascending = false;
+    if (sortOption === "published_asc") { sortColumn = "published_at"; ascending = true; }
+    else if (sortOption === "incident_desc") { sortColumn = "incident_date"; ascending = false; }
 
-    if (sortOption === "published_asc") {
-        sortColumn = "published_at";
-        ascending = true;
-    } else if (sortOption === "incident_desc") {
-        sortColumn = "incident_date";
-        ascending = false;
-    }
-
-    let query = supabase
-        .from("public_incidents")
-        .select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at")
-        .order(sortColumn, { ascending });
-
+    let query = supabase.from("public_incidents").select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at").order(sortColumn, { ascending });
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%,public_id.ilike.%${q}%`);
     if (filters.category) query = query.eq("category_slug", filters.category);
     if (filters.division) query = query.eq("division_slug", filters.division);
@@ -92,7 +61,6 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
         if (filters.category) countQuery = countQuery.eq("category_slug", filters.category);
         if (filters.division) countQuery = countQuery.eq("division_slug", filters.division);
         if (filters.district) countQuery = countQuery.eq("district_slug", filters.district);
-
         const { count: exactCount, error: countError } = await readWithRetry(() => countQuery);
         if (countError) throw new Error("Unable to count public incidents.");
         count = exactCount ?? count;
@@ -116,81 +84,29 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
     return (
         <main className="flex-1 bg-stone-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
             <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mx-auto max-w-[96rem] px-4 py-3 lg:px-6">
-                    <Breadcrumbs items={[{ label: "প্রকাশিত ঘটনা" }]} homeLabel="প্রচ্ছদ" />
-                </div>
+                <div className="mx-auto max-w-[96rem] px-4 py-2 lg:px-6"><Breadcrumbs items={[{ label: "প্রকাশিত ঘটনা" }]} homeLabel="প্রচ্ছদ" /></div>
             </section>
-            <section className="mx-auto max-w-[96rem] px-4 py-6 lg:px-6 lg:py-8">
+            <section className="mx-auto max-w-[96rem] px-4 py-5 lg:px-6 lg:py-7">
                 <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
                     <div>
-                        <div className="mb-5">
-                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">জনসাধারণের নথি</p>
-                            <h1 className="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">প্রকাশিত ঘটনা</h1>
-                            <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">পর্যালোচনা ও অনুমোদনের পর প্রকাশিত ঘটনাগুলোর নথি দেখুন।</p>
-                        </div>
-                        <form className="mb-3 grid gap-3 border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900 sm:grid-cols-[1fr_auto]" method="get">
-                            <input
-                                name="q"
-                                defaultValue={q}
-                                placeholder="ঘটনা, বিবরণ বা পরিচিতি নম্বর দিয়ে খুঁজুন"
-                                aria-label="ঘটনা খুঁজুন"
-                                className="h-11 border border-zinc-300 px-4 text-sm outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white"
-                            />
-                            {filters.category && <input type="hidden" name="category" value={filters.category} />}
-                            {filters.division && <input type="hidden" name="division" value={filters.division} />}
-                            {filters.district && <input type="hidden" name="district" value={filters.district} />}
-                            {filters.sort && <input type="hidden" name="sort" value={filters.sort} />}
-                            <button className="h-11 bg-zinc-950 px-5 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200" type="submit">
-                                খুঁজুন
-                            </button>
+                        <div className="mb-4"><p className="text-xs font-semibold tracking-[0.16em] text-link">জনসাধারণের নথি</p><h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">প্রকাশিত ঘটনা</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">পর্যালোচনা ও অনুমোদনের পর প্রকাশিত ঘটনাগুলোর নথি দেখুন।</p></div>
+                        <form className="mb-2 grid gap-2 border border-zinc-200 bg-white p-2.5 dark:border-zinc-800 dark:bg-zinc-900 sm:grid-cols-[1fr_auto]" method="get">
+                            <input name="q" defaultValue={q} placeholder="ঘটনা, বিবরণ বা পরিচিতি নম্বর দিয়ে খুঁজুন" aria-label="ঘটনা খুঁজুন" className="h-10 border border-zinc-300 bg-white px-3 text-sm outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white" />
+                            {filters.category && <input type="hidden" name="category" value={filters.category} />}{filters.division && <input type="hidden" name="division" value={filters.division} />}{filters.district && <input type="hidden" name="district" value={filters.district} />}{filters.sort && <input type="hidden" name="sort" value={filters.sort} />}
+                            <button className="h-10 bg-zinc-950 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200" type="submit">খুঁজুন</button>
                         </form>
                         <IncidentFilters categories={categories} divisions={divisions} districts={districts} values={{ category: filters.category ?? "", division: filters.division ?? "", district: filters.district ?? "", sort: sortOption }} labels={{ category: "ঘটনার ধরন", division: "বিভাগ", district: "জেলা", sort: "সাজানোর ক্রম", all: "সব", apply: "প্রয়োগ করুন", clear: "মুছে ফেলুন" }} />
                         {incidents.length === 0 ? (
-                            <div className="mt-8 border border-dashed border-zinc-300 bg-white px-6 py-16 text-center dark:border-zinc-800 dark:bg-zinc-900">
-                                <h2 className="text-xl font-semibold">{hasActiveFilters ? "এই অনুসন্ধানে কোনো ঘটনা পাওয়া যায়নি" : "এখনও কোনো প্রকাশিত ঘটনা নেই"}</h2>
-                                <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-zinc-500 dark:text-zinc-400">{hasActiveFilters ? "অনুসন্ধানের শব্দ বা ফিল্টার বদলে আবার চেষ্টা করুন।" : "অনুমোদিত ও প্রকাশিত ঘটনাগুলো এখানে দেখা যাবে।"}</p>
-                                {hasActiveFilters && (
-                                    <Link href="/incidents" className="mt-6 inline-flex h-10 items-center border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-800">
-                                        সব ফিল্টার মুছে ফেলুন
-                                    </Link>
-                                )}
-                            </div>
+                            <div className="mt-6 border border-dashed border-zinc-300 bg-white px-6 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900"><h2 className="text-lg font-semibold">{hasActiveFilters ? "এই অনুসন্ধানে কোনো ঘটনা পাওয়া যায়নি" : "এখনও কোনো প্রকাশিত ঘটনা নেই"}</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500 dark:text-zinc-400">{hasActiveFilters ? "অনুসন্ধানের শব্দ বা ফিল্টার বদলে আবার চেষ্টা করুন।" : "অনুমোদিত ও প্রকাশিত ঘটনাগুলো এখানে দেখা যাবে।"}</p>{hasActiveFilters && <Link href="/incidents" className="mt-4 inline-flex h-9 items-center border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-800">সব ফিল্টার মুছে ফেলুন</Link>}</div>
                         ) : (
                             <>
-                                <div className="mb-4 mt-5 flex flex-wrap items-center justify-between gap-3">
-                                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{count}টি প্রকাশিত ঘটনা</p>
-                                    {hasActiveFilters && (
-                                        <Link href="/incidents" className="text-sm font-semibold text-zinc-700 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900 dark:text-zinc-300 dark:hover:decoration-white">
-                                            ফিল্টার মুছে ফেলুন
-                                        </Link>
-                                    )}
-                                </div>
-                                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                                    {incidents.map((incident) => (
-                                        <IncidentCard key={incident.public_id} incident={incident} />
-                                    ))}
-                                </div>
-                                {totalPages > 1 && (
-                                    <nav className="mt-10 flex items-center justify-between" aria-label="ঘটনার পৃষ্ঠা">
-                                        {page > 1 ? (
-                                            <Link href={`/incidents?${paramsForPage(page - 1)}`} className="inline-flex items-center gap-2 border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
-                                                <span aria-hidden="true">←</span>
-                                                আগের
-                                            </Link>
-                                        ) : (
-                                            <span />
-                                        )}
-                                        <span className="text-sm text-zinc-500 dark:text-zinc-400">পৃষ্ঠা {page} / {totalPages}</span>
-                                        {page < totalPages ? (
-                                            <Link href={`/incidents?${paramsForPage(page + 1)}`} className="inline-flex items-center gap-2 border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
-                                                পরের
-                                                <span aria-hidden="true">→</span>
-                                            </Link>
-                                        ) : (
-                                            <span />
-                                        )}
-                                    </nav>
-                                )}
+                                <div className="mb-3 mt-4 flex flex-wrap items-center justify-between gap-2"><p className="text-sm text-zinc-500 dark:text-zinc-400">{count}টি প্রকাশিত ঘটনা</p>{hasActiveFilters && <Link href="/incidents" className="text-sm font-semibold text-link underline decoration-zinc-300 underline-offset-4 hover:decoration-current">ফিল্টার মুছে ফেলুন</Link>}</div>
+                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">{incidents.map((incident) => <IncidentCard key={incident.public_id} incident={incident} />)}</div>
+                                {totalPages > 1 && <nav className="mt-7 flex items-center justify-between" aria-label="ঘটনার পৃষ্ঠা">
+                                    {page > 1 ? <Link href={`/incidents?${paramsForPage(page - 1)}`} className="inline-flex h-9 items-center gap-2 border border-zinc-300 bg-white px-3 text-sm font-semibold dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"><span aria-hidden="true">←</span>আগের</Link> : <span />}
+                                    <span className="text-sm text-zinc-500 dark:text-zinc-400">পৃষ্ঠা {page} / {totalPages}</span>
+                                    {page < totalPages ? <Link href={`/incidents?${paramsForPage(page + 1)}`} className="inline-flex h-9 items-center gap-2 border border-zinc-300 bg-white px-3 text-sm font-semibold dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">পরের<span aria-hidden="true">→</span></Link> : <span />}
+                                </nav>}
                             </>
                         )}
                     </div>
