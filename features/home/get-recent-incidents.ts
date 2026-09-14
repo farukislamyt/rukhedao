@@ -29,5 +29,5 @@ export const getRecentPublishedIncidents = unstable_cache(
         return (data ?? []) as PublicIncident[];
     },
     ["recent-published-incidents"],
-    { revalidate: 60, tags: ["home-incidents"] }
+    { revalidate: 300, tags: ["home-incidents"] }
 );
