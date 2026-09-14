@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 
 /** Returns "YYYY-MM-DD" in Asia/Dhaka timezone. */
 function todayInDhaka(): string {
@@ -145,7 +144,12 @@ export function DatePicker({ name, value, onChange, placeholder = "Select date",
         ].join(" ")}
       >
         <span>{displayValue}</span>
-        <CalendarDays className="h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" aria-hidden="true" />
+        <span className="relative h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" aria-hidden="true">
+          <span className="absolute inset-x-0 top-1 h-3 rounded-[2px] border-[1.5px] border-current" />
+          <span className="absolute left-1 top-0 h-1.5 w-px bg-current" />
+          <span className="absolute right-1 top-0 h-1.5 w-px bg-current" />
+          <span className="absolute inset-x-0 top-2 border-t border-current" />
+        </span>
       </button>
 
       {/* Calendar panel */}
@@ -163,7 +167,7 @@ export function DatePicker({ name, value, onChange, placeholder = "Select date",
               aria-label="Previous month"
               className="flex h-8 w-8 items-center justify-center text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
-              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              <span className="block h-2.5 w-2.5 -rotate-45 border-l-2 border-b-2 border-current" aria-hidden="true" />
             </button>
             <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {MONTH_NAMES[viewMonth]} {viewYear}
@@ -175,7 +179,7 @@ export function DatePicker({ name, value, onChange, placeholder = "Select date",
               aria-label="Next month"
               className="flex h-8 w-8 items-center justify-center text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
-              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              <span className="block h-2.5 w-2.5 rotate-45 border-t-2 border-r-2 border-current" aria-hidden="true" />
             </button>
           </div>
 
