@@ -66,7 +66,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
 
     let query = supabase
         .from("public_incidents")
-        .select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at", { count: "exact" })
+        .select("public_id,title,description,incident_date,category,category_slug,division,division_slug,district,district_slug,verification_status,published_at")
         .order(sortColumn, { ascending });
 
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%,public_id.ilike.%${q}%`);
@@ -75,10 +75,24 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
     if (filters.district) query = query.eq("district_slug", filters.district);
 
     const from = (page - 1) * PAGE_SIZE;
-    const { data, error, count } = await query.range(from, from + PAGE_SIZE - 1);
+    const { data, error } = await query.range(from, from + PAGE_SIZE - 1);
     if (error) throw new Error("Unable to load public incidents.");
     const incidents = (data ?? []) as PublicIncident[];
-    const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
+
+    let count = from + incidents.length;
+    if (incidents.length === PAGE_SIZE) {
+        let countQuery = supabase.from("public_incidents").select("public_id", { count: "exact", head: true });
+        if (q) countQuery = countQuery.or(`title.ilike.%${q}%,description.ilike.%${q}%,public_id.ilike.%${q}%`);
+        if (filters.category) countQuery = countQuery.eq("category_slug", filters.category);
+        if (filters.division) countQuery = countQuery.eq("division_slug", filters.division);
+        if (filters.district) countQuery = countQuery.eq("district_slug", filters.district);
+
+        const { count: exactCount, error: countError } = await countQuery;
+        if (countError) throw new Error("Unable to count public incidents.");
+        count = exactCount ?? count;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
     const hasActiveFilters = Boolean(q || filters.category || filters.division || filters.district || (filters.sort && filters.sort !== "published_desc"));
     const paramsForPage = (nextPage: number) => {
         const next = new URLSearchParams();
@@ -138,7 +152,7 @@ export default async function IncidentsPage({ searchParams }: { searchParams: Se
                         ) : (
                             <>
                                 <div className="mb-4 mt-5 flex flex-wrap items-center justify-between gap-3">
-                                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{count ?? incidents.length}টি প্রকাশিত ঘটনা</p>
+                                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{count}টি প্রকাশিত ঘটনা</p>
                                     {hasActiveFilters && (
                                         <Link href="/incidents" className="text-sm font-semibold text-zinc-700 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900 dark:text-zinc-300 dark:hover:decoration-white">
                                             ফিল্টার মুছে ফেলুন
