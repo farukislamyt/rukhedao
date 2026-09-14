@@ -2,14 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 
+const dhakaDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Dhaka",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 /** Returns "YYYY-MM-DD" in Asia/Dhaka timezone. */
 function todayInDhaka(): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Dhaka",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
+  const parts = dhakaDateFormatter.formatToParts(new Date());
   const v = Object.fromEntries(parts.map((p) => [p.type, p.value]));
   return `${v.year}-${v.month}-${v.day}`;
 }
