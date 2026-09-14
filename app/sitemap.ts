@@ -15,7 +15,7 @@ const publicRoutes = [
     "/terms",
 ];
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const routes = publicRoutes.map((route) => ({
@@ -37,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .from("public_incidents")
         .select("public_id,published_at")
         .not("public_id", "is", null)
+        .not("published_at", "is", null)
         .order("published_at", { ascending: false })
         .limit(5000);
 
