@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
 
 type Props = { homeLabel: string; incidentsLabel: string; reportLabel: string };
 
@@ -42,10 +41,18 @@ export function MobileNavMenu({ homeLabel, incidentsLabel, reportLabel }: Props)
         aria-controls="mobile-navigation"
         aria-label={open ? "নেভিগেশন মেনু বন্ধ করুন" : "নেভিগেশন মেনু খুলুন"}
       >
-        {open
-          ? <X className="h-5 w-5" aria-hidden="true" />
-          : <Menu className="h-5 w-5" aria-hidden="true" />
-        }
+        {open ? (
+          <span className="relative h-5 w-5" aria-hidden="true">
+            <span className="absolute left-1/2 top-1/2 h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-current" />
+            <span className="absolute left-1/2 top-1/2 h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-current" />
+          </span>
+        ) : (
+          <span className="flex h-5 w-5 flex-col justify-center gap-1" aria-hidden="true">
+            <span className="h-0.5 w-5 bg-current" />
+            <span className="h-0.5 w-5 bg-current" />
+            <span className="h-0.5 w-5 bg-current" />
+          </span>
+        )}
       </button>
 
       {open && (
@@ -64,7 +71,7 @@ export function MobileNavMenu({ homeLabel, incidentsLabel, reportLabel }: Props)
             <Link
               href="/incidents"
               onClick={closeMenu}
-              className="px-4 py-3 text-base font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-white"
+              className="px-4 py-3 text-base font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:hover:bg-zinc-800 dark:focus-visible:ring-white"
             >
               {incidentsLabel}
             </Link>
