@@ -80,5 +80,5 @@ export const getHomeLedgerData = unstable_cache(
         };
     },
     ["home-ledger-data"],
-    { revalidate: 60, tags: ["home-ledgers"] }
+    { revalidate: 300, tags: ["home-ledgers"] }
 );
