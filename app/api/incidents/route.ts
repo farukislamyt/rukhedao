@@ -157,9 +157,30 @@ export async function POST(request: Request) {
         message: error?.message,
       });
 
+      // A timeout does not prove that the insert failed: the database may have
+      // committed successfully before the response was lost. Verify the same
+      // generated public_id before telling the user to submit again, avoiding
+      // both duplicate submissions and unnecessary write retries.
+      const { data: committed, error: verificationError } = await serviceRole
+        .from("incidents")
+        .select("public_id")
+        .eq("public_id", publicId)
+        .maybeSingle();
+
+      if (!verificationError && committed?.public_id === publicId) {
+        return NextResponse.json({ publicId: committed.public_id }, { status: 201 });
+      }
+
+      if (verificationError) {
+        console.error("Anonymous incident insert verification failed", {
+          code: verificationError.code,
+          message: verificationError.message,
+        });
+      }
+
       // The existing anonymous RPC is not a safe fallback when the database
       // function itself is unavailable. Keep the API on the service-role path
-      // when configured instead of making a second failing database call.
+      // when configured instead of making a second failing write call.
       return NextResponse.json({ message: "এই মুহূর্তে ঘটনা জমা দেওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।" }, { status: 503 });
     }
 
