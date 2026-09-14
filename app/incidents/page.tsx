@@ -38,9 +38,9 @@ function getPublicClient() {
 
 const PAGE_SIZE = 24;
 
-async function readWithRetry<T>(run: () => PromiseLike<{ data: T; error: unknown }>) {
+async function readWithRetry<T>(run: () => PromiseLike<T>): Promise<T> {
     const first = await run();
-    if (!first.error) return first;
+    if (!("error" in first) || !first.error) return first;
     await new Promise((resolve) => setTimeout(resolve, 150));
     return run();
 }
