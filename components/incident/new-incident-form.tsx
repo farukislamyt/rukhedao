@@ -46,14 +46,18 @@ type Props = {
   };
 };
 
-function todayInDhaka() {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Dhaka",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
+const dhakaDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Dhaka",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
+const inputClass = "mt-2 h-12 w-full border border-zinc-300 bg-white px-4 text-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white";
+const selectClass = "mt-2 h-12 w-full border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white dark:disabled:bg-zinc-900";
+
+function todayInDhaka() {
+  const parts = dhakaDateFormatter.formatToParts(new Date());
   const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
   return `${values.year}-${values.month}-${values.day}`;
 }
@@ -215,8 +219,6 @@ export function NewIncidentForm({ categories, divisions, districts, labels: t }:
   }
 
   const today = todayInDhaka();
-  const inputClass = "mt-2 h-12 w-full border border-zinc-300 bg-white px-4 text-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white";
-  const selectClass = "mt-2 h-12 w-full border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:focus:border-white dark:disabled:bg-zinc-900";
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-8" aria-describedby={error ? "incident-submit-error" : undefined}>
