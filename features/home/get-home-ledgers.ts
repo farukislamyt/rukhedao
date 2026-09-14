@@ -33,31 +33,46 @@ export const getHomeLedgerData = unstable_cache(
             return { divisions: [], categories: [] };
         }
 
-        const divisionCounts = new Map<string, { slug: string | null; count: number }>();
-        const categoryCounts = new Map<string, { slug: string | null; count: number }>();
+        // Aggregate in-place so large result sets do not create a new object
+        // for every incident. This preserves the exact same output while
+        // reducing server-side allocations and garbage-collection work.
+        const divisionCounts = new Map<string, LedgerItem>();
+        const categoryCounts = new Map<string, LedgerItem>();
 
         for (const incident of data ?? []) {
             if (incident.division) {
                 const current = divisionCounts.get(incident.division);
-                divisionCounts.set(incident.division, {
-                    slug: current?.slug ?? incident.division_slug,
-                    count: (current?.count ?? 0) + 1,
-                });
+
+                if (current) {
+                    current.count += 1;
+                } else {
+                    divisionCounts.set(incident.division, {
+                        name: incident.division,
+                        slug: incident.division_slug,
+                        count: 1,
+                    });
+                }
             }
 
             if (incident.category) {
                 const current = categoryCounts.get(incident.category);
-                categoryCounts.set(incident.category, {
-                    slug: current?.slug ?? incident.category_slug,
-                    count: (current?.count ?? 0) + 1,
-                });
+
+                if (current) {
+                    current.count += 1;
+                } else {
+                    categoryCounts.set(incident.category, {
+                        name: incident.category,
+                        slug: incident.category_slug,
+                        count: 1,
+                    });
+                }
             }
         }
 
-        const toLedgerItems = (counts: Map<string, { slug: string | null; count: number }>) =>
-            [...counts.entries()]
-                .map(([name, value]) => ({ name, slug: value.slug, count: value.count }))
-                .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+        const toLedgerItems = (counts: Map<string, LedgerItem>) =>
+            [...counts.values()].sort(
+                (a, b) => b.count - a.count || a.name.localeCompare(b.name)
+            );
 
         return {
             divisions: toLedgerItems(divisionCounts),
