@@ -15,6 +15,12 @@ type SubmissionBody = {
 };
 
 const MAX_BODY_BYTES = 16_384;
+const dhakaDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Dhaka",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,12 +40,7 @@ function reader() {
 }
 
 function today() {
-  const p = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Dhaka",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
+  const p = dhakaDateFormatter.formatToParts(new Date());
   const v = Object.fromEntries(p.map((x) => [x.type, x.value]));
   return `${v.year}-${v.month}-${v.day}`;
 }
@@ -155,8 +156,15 @@ export async function POST(request: Request) {
         code: error?.code,
         message: error?.message,
       });
+
+      // The existing anonymous RPC is not a safe fallback when the database
+      // function itself is unavailable. Keep the API on the service-role path
+      // when configured instead of making a second failing database call.
+      return NextResponse.json({ message: "এই মুহূর্তে ঘটনা জমা দেওয়া যাচ্ছে না। পরে আবার চেষ্টা করুন।" }, { status: 503 });
     }
 
+    // Preserve the existing RPC path only for environments where the server-role
+    // credential is intentionally unavailable.
     const rpcResult = await read.rpc("create_anonymous_incident", {
       p_title: title,
       p_description: description,
